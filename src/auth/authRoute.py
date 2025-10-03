@@ -12,11 +12,12 @@ def login():
 
         if auth_service.login(cpf, senha):
             session["usuario"] = cpf
+            session.permanent = True
             flash("Login realizado com sucesso!", "success")
             return redirect(url_for("menu.menu"))
         else:
             flash("CPF ou senha inválidos", "danger")
-            return redirect(url_for("home"))
+            return redirect(url_for("home.index"))
 
     return render_template("login.html")
 
@@ -24,4 +25,4 @@ def login():
 def logout():
     session.pop("usuario", None)
     flash("Logout realizado com sucesso.", "success")
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("home.index"))
