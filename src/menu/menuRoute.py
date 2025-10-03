@@ -1,10 +1,8 @@
-from flask import Blueprint, render_template, session, redirect, url_for, flash
+from flask import Blueprint, render_template
+from Utils import login_required
 
-menu_bp = Blueprint("menu", __name__, url_prefix="/menu")
-
-@menu_bp.route("/")
+menu_bp = Blueprint("menu", __name__, url_prefix="/menu") 
+@menu_bp.route("/", methods=['GET'])
+@login_required
 def menu():
-    if "usuario" not in session:
-        flash("Você precisa fazer login primeiro.", "warning")
-        return redirect(url_for("auth.login"))
-    return render_template("Menu.html", usuario=session["usuario"])
+    return render_template("Menu.html")

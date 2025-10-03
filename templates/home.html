@@ -3,28 +3,45 @@
 {% block title %}Página Inicial - FlaskApp{% endblock %}
 
 {% block head %} 
-  <style>
-    body {
+<style>
+  body, html {
+    height: 100%;
+    margin: 0;
+  }
+  body {
     background: url("{{ url_for('static', filename='images/background.jpg') }}") no-repeat center center fixed;
     background-size: cover;
     color: white;
     text-shadow: 1px 1px 3px black;
   }
-  </style>
-
+  .overlay {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+</style>
 {% endblock %}
 
 {% block nav %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">FlaskApp</a>
+    <a class="navbar-brand" href="{{ url_for('home.index') }}">FlaskApp</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="/auth/login">Login</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Registrar</a></li>
+        {% if session.get('usuario') %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('menu.menu') }}">Menu</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Registrar</a></li>
+        {% endif %}
       </ul>
     </div>
   </div>
@@ -32,6 +49,8 @@
 {% endblock %}
 
 {% block content %}
-  
-  </div>
+<div class="overlay">
+  <h1>Bem vindo</h1>
+  <h2>Tudo aqui é público. Para acessar o privado, faça o login</h2>
+</div>
 {% endblock %}

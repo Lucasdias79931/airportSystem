@@ -16,7 +16,7 @@ def login():
             return redirect(url_for("menu.menu"))
         else:
             flash("CPF ou senha inválidos", "danger")
-            return redirect(url_for("auth.login"))
+            return redirect(url_for("home"))
 
     return render_template("login.html")
 
