@@ -1,4 +1,3 @@
-# src/home/homeRoute.py
 from flask import Blueprint, session, render_template, redirect, url_for
 
 home_bp = Blueprint("home", __name__, url_prefix="/")
