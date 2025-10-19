@@ -10,6 +10,11 @@ ALLUSERS = [
     }
 ]
 
+usersDict = {
+    "caliel": bcrypt.hashpw("abcd".encode("utf-8"), bcrypt.gensalt()),
+    "lucas": bcrypt.hashpw("abcd".encode("utf-8"), bcrypt.gensalt()),
+}
+
 class authRepository:
     def __init__(self):
         pass
@@ -20,3 +25,4 @@ class authRepository:
             if user['cpf'] == cpf:
                 return bcrypt.checkpw(password.encode('utf-8'), user['password'])
         return False
+
