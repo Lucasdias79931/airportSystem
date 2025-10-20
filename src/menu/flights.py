@@ -27,3 +27,4 @@ flights = {
         1: Flight(1, 15, "ilhéus", "salvador", 12, 13),
 } 
     
+lastId = 1

@@ -3,6 +3,14 @@
 {% block title %}Página Inicial - FlaskApp{% endblock %}
 
 {% block head %} 
+
+    <script>
+        function toggleForm() {
+            const form = document.getElementById("flightForm");
+            form.style.display = form.style.display === "block" ? "none" : "block";
+        }
+    </script>
+
   <style>
     body {
     background: url("{{ url_for('static', filename='images/background.jpg') }}") no-repeat center center fixed;
@@ -24,6 +32,22 @@
       color: white; /* text contrast */
   }
 
+  .form-box {
+    display: none;
+    position: absolute;
+    top: 50px; 
+    right: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+
+  .form-box input {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
   </style>
 
 {% endblock %}
@@ -35,23 +59,45 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item">
+                <button class="btn btn-outline-light" type="button" onclick="toggleForm()">Add Flight</button>
+            </li>    
+        </ul>
+    </div>
   </div>
 </nav>
 {% endblock %}
 
-{% block content %}
+{% block content%}
 <div class = "flights-container">
-  {% for flight in flights %}
+  {% for flight in flights.values() %}
   <div class="flight">
     <strong>{{ flight.source}}</strong> → <strong>{{ flight.destination }}</strong><br>
     Entry Time: {{ flight.entryTime}}<br>
     Exit Time: {{ flight.exitTime}}<br>
     Price: ${{ flight.price }}
   </div>
-  {% else %}
-  <p>No flights available.</p>
   {% endfor %}
 </div>
-  
-  </div>
-{% endblock %}
+<div id="flightForm" class="form-box">
+    <form method="POST" action="{{ url_for('menu.menu') }}">
+        <label>Source:</label>
+        <input type="text" name="source"><br>
+
+        <label>Destination:</label>
+        <input type="text" name="destination"><br>
+
+        <label>Entry Time:</label>
+        <input type="time" name="entryTime"><br>
+
+        <label>Exit Time:</label>
+        <input type="time" name="exitTime"><br>
+
+        <label>Price:</label>
+        <input type="number" name="price"><br>
+
+        <button type="submit">Add</button>
+    </form>
+    {% endblock %}
