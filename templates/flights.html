@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Página Inicial - FlaskApp{% endblock %}
+
+{% block head %} 
+
+    <script>
+        function deleteFlight(flightId) {
+            fetch("/menu/delete_flight?id=" + flightId, { method: "POST"})
+                .then(() => {
+                    window.location.href = "/menu";  // redirect manually
+                });
+        }
+    </script>
+
+
+    <style>
+
+  body {
+    background: url("{{ url_for('static', filename='images/background.jpg') }}") no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    text-shadow: 1px 1px 3px black;
+  }
+
+  .btn-edit, .btn-delete {
+      padding: 4px 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.85rem;
+  }
+
+  .btn-edit {
+      background-color: rgba(200, 150, 50, 0.8);
+      color: white;
+  }
+
+  .btn-delete {
+      background-color: rgba(255, 50, 50, 0.8);
+      color: white;
+  }
+
+
+  </style>
+
+{% endblock %}
+
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">FlaskApp</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item">
+            </li>    
+        </ul>
+    </div>
+  </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div id="flightForm" class="form-box">
+    <form method="POST" action="{{ url_for('menu.flightEdit')}}?id={{flight.id}}">
+        <label>Source:</label>
+        <input type="text" name="source" value="{{flight.source}}"><br>
+
+        <label>Destination:</label>
+        <input type="text" name="destination" value="{{flight.destination}}"><br>
+
+        <label>Entry Time:</label>
+        <input type="time" name="entryTime" value="{{flight.entryTime}}"><br>
+
+        <label>Exit Time:</label>
+        <input type="time" name="exitTime" value="{{flight.exitTime}}"><br>
+
+        <label>Price:</label>
+        <input type="number" name="price" value="{{flight.price}}"><br>
+
+        <button class="btn-edit" type="submit">edit</button>
+        <button class="btn-delete" type="button" onclick="deleteFlight({{ flight.id }})">Delete</button>
+    </form>
+{% endblock %}

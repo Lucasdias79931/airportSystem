@@ -1,3 +1,5 @@
+import pickle
+
 class User:
     #string
     cpf = None
@@ -18,4 +20,21 @@ class User:
         self.flightsBooked = flightsBooked
         return
 
+usersDict = {}
 
+def saveUsers():
+    with open("users.bin", "wb") as f:   # "wb" = write binary
+        pickle.dump(usersDict, f)
+
+    return
+
+def loadUsers():
+    global usersDict
+
+    try:
+        with open("users.bin", "rb") as f:   # "rb" = read binary
+            usersDict = pickle.load(f)
+    except FileNotFoundError:
+        a = None
+
+    return

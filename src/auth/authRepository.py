@@ -10,8 +10,6 @@ ALLUSERS = [
     }
 ]
 
-usersDict = {}
-
 class authRepository:
     def __init__(self):
         pass

@@ -9,10 +9,16 @@
             const form = document.getElementById("flightForm");
             form.style.display = form.style.display === "block" ? "none" : "block";
         }
+
+        function edit() {
+            const form = document.getElementById("flightForm");
+            form.style.display = form.style.display === "block" ? "none" : "block";
+        }
     </script>
 
-  <style>
-    body {
+    <style>
+
+  body {
     background: url("{{ url_for('static', filename='images/background.jpg') }}") no-repeat center center fixed;
     background-size: cover;
     color: white;
@@ -48,6 +54,26 @@
     margin-bottom: 8px;
   }
 
+  .btn-edit, .btn-delete {
+      float: right;
+      padding: 4px 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.85rem;
+  }
+
+  .btn-edit {
+      background-color: rgba(200, 150, 50, 0.8);
+      color: white;
+  }
+
+  .btn-delete {
+      background-color: rgba(255, 50, 50, 0.8);
+      color: white;
+  }
+
+
   </style>
 
 {% endblock %}
@@ -75,9 +101,12 @@
   {% for flight in flights.values() %}
   <div class="flight">
     <strong>{{ flight.source}}</strong> → <strong>{{ flight.destination }}</strong><br>
-    Entry Time: {{ flight.entryTime}}<br>
-    Exit Time: {{ flight.exitTime}}<br>
-    Price: ${{ flight.price }}
+    Horário de partida: {{ flight.entryTime}}<br>
+    Horário de chegada: {{ flight.exitTime}}<br>
+    Preço: ${{ flight.price }}
+    <div class="flight-buttons">
+        <a class="btn-edit" href="/menu/flight?id={{flight.id}}">Edit</a>
+    </div>
   </div>
   {% endfor %}
 </div>
