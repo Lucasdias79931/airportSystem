@@ -10,6 +10,20 @@
     color: white;
     text-shadow: 1px 1px 3px black;
   }
+  .flights-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+
+  .flight {
+      background: linear-gradient(135deg, rgba(0.4, 0.36, 0.36, 0.5), rgba(0.4, 0.36, 1.0, 0.5));
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      color: white; /* text contrast */
+  }
+
   </style>
 
 {% endblock %}
@@ -26,6 +40,18 @@
 {% endblock %}
 
 {% block content %}
+<div class = "flights-container">
+  {% for flight in flights %}
+  <div class="flight">
+    <strong>{{ flight.source}}</strong> → <strong>{{ flight.destination }}</strong><br>
+    Entry Time: {{ flight.entryTime}}<br>
+    Exit Time: {{ flight.exitTime}}<br>
+    Price: ${{ flight.price }}
+  </div>
+  {% else %}
+  <p>No flights available.</p>
+  {% endfor %}
+</div>
   
   </div>
 {% endblock %}

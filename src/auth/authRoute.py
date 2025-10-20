@@ -1,6 +1,7 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash
 from .authService import AuthService
 from .authRepository import usersDict 
+from .user import User
 import bcrypt
 
 auth_bp = Blueprint("auth", __name__, url_prefix='/auth')
@@ -12,7 +13,7 @@ def login():
         cpf = request.form.get("cpf")       
         senha = request.form.get("password")  
 
-        if cpf in usersDict and bcrypt.checkpw(senha.encode('utf-8'), usersDict[cpf]):
+        if cpf in usersDict and bcrypt.checkpw(senha.encode('utf-8'), usersDict[cpf].password):
             session["usuario"] = cpf
             flash("Login realizado com sucesso!", "success")
             return redirect(url_for("menu.menu"))
@@ -30,7 +31,7 @@ def register():
         senha = request.form.get("password")  
 
         if cpf not in usersDict:
-            usersDict[cpf] = bcrypt.hashpw(senha.encode("utf-8"), bcrypt.gensalt())
+            usersDict[cpf] = User(cpf, "name", bcrypt.hashpw(senha.encode("utf-8"), bcrypt.gensalt()), None, None)
             session["usuario"] = cpf
             flash("Login realizado com sucesso!", "success")
             return redirect(url_for("menu.menu"))

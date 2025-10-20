@@ -10,10 +10,7 @@ ALLUSERS = [
     }
 ]
 
-usersDict = {
-    "caliel": bcrypt.hashpw("abcd".encode("utf-8"), bcrypt.gensalt()),
-    "lucas": bcrypt.hashpw("abcd".encode("utf-8"), bcrypt.gensalt()),
-}
+usersDict = {}
 
 class authRepository:
     def __init__(self):

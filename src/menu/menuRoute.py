@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash
+from .flights import flights
 
 menu_bp = Blueprint("menu", __name__, url_prefix="/menu")
 
@@ -7,4 +8,4 @@ def menu():
     if "usuario" not in session:
         flash("Você precisa fazer login primeiro.", "warning")
         return redirect(url_for("auth.login"))
-    return render_template("Menu.html", usuario=session["usuario"])
+    return render_template("Menu.html", usuario=session["usuario"], flights = flights)
