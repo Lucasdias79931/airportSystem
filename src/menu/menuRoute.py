@@ -1,15 +1,14 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash
 from ..models import flights 
+from Utils.Utils import login_required
 
 menu_bp = Blueprint("menu", __name__, url_prefix="/menu")
 
+@login_required
 @menu_bp.route("/", methods=["GET", "POST"])
 def menu():
     flights.loadFlights()
-    if "usuario" not in session:
-        flash("Você precisa fazer login primeiro.", "warning")
-        return redirect(url_for("auth.login"))
-
+    
     if request.method == "POST":
         flights.lastId += 1
         newId = flights.lastId

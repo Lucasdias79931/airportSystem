@@ -6,7 +6,7 @@
         "flightsCreated": 0,
         "flightsBooked": 0,
         "status": 1,
-        "privilege": 1
+        "privilege": 2
     },
     {
         "cpf": "76891607515",
@@ -16,5 +16,23 @@
         "flightsBooked": 0,
         "status": 1,
         "privilege": 1
+    },
+    {
+        "cpf": "62971312011",
+        "password": "$2b$12$cqNc/qVHrTye56w3uE03eu/HNa1xWaNwitQp6DB63M.aUwcSz83oG",
+        "name": "Administrador",
+        "flightsCreated": 0,
+        "flightsBooked": 0,
+        "status": 1,
+        "privilege": 2
+    },
+    {
+        "cpf": "62971312011",
+        "password": "$2b$12$aT6may0LR3gYzNgroBsVCe2AUcU9NVbmhFl0MffEo/YHE.D1noLcq",
+        "name": "Administrador",
+        "flightsCreated": 0,
+        "flightsBooked": 0,
+        "status": 1,
+        "privilege": 2
     }
 ]

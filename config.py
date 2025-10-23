@@ -1,8 +1,11 @@
 from dotenv import load_dotenv
 from datetime import timedelta
+from src.home.homeRoute import home_bp
 from src.auth.authRoute import auth_bp
 from src.menu.menuRoute import menu_bp
 from src.user.userRoute import user_bp
+import os
+
 class ConfigFlask:
     def __init__(self):
         load_dotenv()
