@@ -24,8 +24,7 @@ class Flight:
 
 #local onde irá ser colocado todos os voos
 #chave vai ser o id do voo e o conteúdo vai ser a struct do voo em si
-flights = {
-} 
+flights = {} 
 
 lastId = 1
 

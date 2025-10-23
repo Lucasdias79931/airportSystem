@@ -1,5 +1,5 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash
-from . import flights 
+from ..models import flights 
 
 menu_bp = Blueprint("menu", __name__, url_prefix="/menu")
 

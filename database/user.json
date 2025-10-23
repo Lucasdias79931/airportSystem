@@ -1,0 +1,20 @@
+[
+    {
+        "cpf": "06485000550",
+        "password": "$2b$12$PxM0MValne64NgwmXcjmHe61Fz6ZU9bn5TCI4pkmsLFrw7Nj2LbMi",
+        "name": "lucas dos santos dias",
+        "flightsCreated": 0,
+        "flightsBooked": 0,
+        "status": 1,
+        "privilege": 1
+    },
+    {
+        "cpf": "76891607515",
+        "password": "$2b$12$VsWfOIYpeN2z.ecFdfkbJuLZmMW9waH8MnZnY/uI3yiZiSqYPVOF.",
+        "name": "lucas dos santos dias",
+        "flightsCreated": 0,
+        "flightsBooked": 0,
+        "status": 1,
+        "privilege": 1
+    }
+]
