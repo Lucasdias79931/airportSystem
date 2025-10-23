@@ -2,10 +2,7 @@ from dotenv import load_dotenv
 from datetime import timedelta
 from src.auth.authRoute import auth_bp
 from src.menu.menuRoute import menu_bp
-from src.home.homeRoute import home_bp
-import os
-
-
+from src.user.userRoute import user_bp
 class ConfigFlask:
     def __init__(self):
         load_dotenv()
@@ -17,4 +14,4 @@ class ConfigFlask:
         app.register_blueprint(auth_bp)
         app.register_blueprint(home_bp)
         app.register_blueprint(menu_bp)
-        
+        app.register_blueprint(user_bp)
