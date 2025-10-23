@@ -18,4 +18,4 @@ def login():
 def logout():
     session.pop("usuario", None)
     flash("Logout realizado com sucesso.", "success")
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("home.index"))
