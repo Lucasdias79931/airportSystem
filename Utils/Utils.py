@@ -92,11 +92,9 @@ def admin_required(f):
             flash("Você precisa estar logado.", "warning")
             return redirect(url_for("auth.login"))
 
-        # O objeto 'usuario' que está na sessão deve conter o campo 'privilege'
-        privilege = usuario.get("privilege")
+        privilege = session.get("privilege")
 
-        # Se o usuário não for admin, nega o acesso
-        if privilege != Privileg.Adm.name and privilege != Privileg.Adm.value:
+        if privilege != 2:
             flash("Acesso restrito a administradores.", "danger")
             return redirect(url_for("menu.menu"))
 
