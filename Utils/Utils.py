@@ -4,7 +4,7 @@ from functools import wraps
 import json
 import os
 from dotenv import load_dotenv
-
+from flask import flash, session, redirect, url_for
 
 class Privileg(Enum):
     Normal = 1
@@ -72,3 +72,33 @@ def verifyIfCpfExist(cpf:str):
 
     return False
     
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'usuario' not in session:
+            flash("Você precisa fazer login primeiro.", "warning")
+            return redirect(url_for("auth.login"))
+        return f(*args, **kwargs)
+    return decorated_function
+ 
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        usuario = session.get("usuario")
+
+        if not usuario:
+            flash("Você precisa estar logado.", "warning")
+            return redirect(url_for("auth.login"))
+
+        # O objeto 'usuario' que está na sessão deve conter o campo 'privilege'
+        privilege = usuario.get("privilege")
+
+        # Se o usuário não for admin, nega o acesso
+        if privilege != Privileg.Adm.name and privilege != Privileg.Adm.value:
+            flash("Acesso restrito a administradores.", "danger")
+            return redirect(url_for("menu.menu"))
+
+        return f(*args, **kwargs)
+    return decorated_function

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Menu - FlaskApp{% endblock %}
+{% block title %}settings {% endblock %}
 
 {% block head %} 
 
@@ -89,6 +89,8 @@
         <ul class="navbar-nav ms-auto align-items-center">
             <li class="nav-item">
                 <button class="btn btn-outline-light" type="button" onclick="toggleForm()">Add Flight</button>
+                <li class="nav-item"><a class="nav-link" href="/dashboardADM">dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="/auth/logout">Logout</a></li>
             </li>    
         </ul>
     </div>
@@ -105,13 +107,14 @@
     Horário de chegada: {{ flight.exitTime}}<br>
     Preço: ${{ flight.price }}
     <div class="flight-buttons">
-        <a class="btn-edit" href="/menu/flight?id={{flight.id}}">Edit</a>
+        <a class="btn-edit" href="/settings/flight?id={{flight.id}}">Edit</a>
+        
     </div>
   </div>
   {% endfor %}
 </div>
 <div id="flightForm" class="form-box">
-    <form method="POST" action="{{ url_for('menu.menu') }}">
+    <form method="POST" action="{{ url_for('settings.settings') }}">
         <label>Source:</label>
         <input type="text" name="source"><br>
 
