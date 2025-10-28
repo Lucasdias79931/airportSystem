@@ -1,10 +1,10 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash
 from ..models import flights 
-from Utils.Utils import login_required
+from Utils.Utils import admin_required
 
 settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
-@login_required
+@admin_required
 @settings_bp.route("/", methods=["GET", "POST"])
 def settings():
     flights.loadFlights()

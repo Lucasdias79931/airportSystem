@@ -16,6 +16,7 @@ class AuthService:
 
         if user_auth and user_auth.get("status"):
             session["usuario"] = cpf
+            session["privilege"] = user_auth["Privileg"] 
             return user_auth["Privileg"]  
         else:
             raise ValueError(user_auth['message'])
