@@ -2,11 +2,11 @@ from flask import Blueprint, request, render_template, session, redirect, url_fo
 from ..models import flights 
 from Utils.Utils import login_required
 
-menu_bp = Blueprint("menu", __name__, url_prefix="/menu")
+settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
 @login_required
-@menu_bp.route("/", methods=["GET", "POST"])
-def menu():
+@settings_bp.route("/", methods=["GET", "POST"])
+def settings():
     flights.loadFlights()
     
     if request.method == "POST":
@@ -21,9 +21,9 @@ def menu():
         flights.flights[newId] = flights.Flight(newId, price, source, destination, entryTime, exitTime)
         flights.saveFlights()
 
-    return render_template("Menu.html", usuario=session["usuario"], flights = flights.flights)
+    return render_template("setings.html", usuario=session["usuario"], flights = flights.flights)
 
-@menu_bp.route("/flight", methods=["GET", "POST"])
+@settings_bp.route("/flight", methods=["GET", "POST"])
 def flightEdit():
     flightId = int(request.args.get("id"))
 
@@ -40,10 +40,10 @@ def flightEdit():
 
     return render_template("flights.html", flight = flights.flights[flightId])
 
-@menu_bp.route("/delete_flight", methods=["POST"])
+@settings_bp.route("/delete_flight", methods=["POST"])
 def deleteFlight():
     flightId = int(request.args.get("id"))
     del flights.flights[flightId]
     flights.saveFlights()
-    return redirect(url_for("menu.menu"))
+    return redirect(url_for("settings.settings"))
 

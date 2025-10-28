@@ -7,8 +7,8 @@ from src.user.userDTO.userRepository import UserRepository
 
 adm = createUserDto(
     cpf="62971312011",
-    name="Administrador",
-    password="krakqp1234",
+    name="lucas dos santos dias",
+    password="010101",
     privilege=Privileg.Adm,
     status=Status.Ativo
 )
