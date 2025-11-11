@@ -2,12 +2,12 @@ import pickle
 
 class Flight:
     #inteiros
-    id = None
-    price = None
+    id : int
+    price : int
 
     #Strings 
-    source = None
-    destination = None 
+    source : str
+    destination : str
 
     #datas/tempo
     entryTime = None

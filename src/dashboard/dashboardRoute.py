@@ -1,12 +1,55 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash
 from Utils.Utils import login_required
 import src.models.flights as flights
+from src.auth.authRoute import auth_service 
+from src.user.userDTO.createUserDTO import createUserDto
+import json
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 @login_required
 @dashboard_bp.route('/', methods=['GET','POST'])
 def dashboard():
+    cpf = session.get('usuario');
+
+    user : createUserDto | None = auth_service.auth_repo.loadUser(cpf);
+    if(user == None):
+        return render_template("dashboard.html", flights = flights.flights, bookedFlights = None);
+
     flights.loadFlights();
+    print(user.flightsBookedIDS);
     if request.method == "GET":
-        return render_template("dashboard.html", flights = flights.flights)
+        return render_template("dashboard.html", flights = flights.flights, bookedFlights = user.flightsBookedIDS);
+
+
+@login_required
+@dashboard_bp.route('/book_flight', methods=['GET','POST'])
+def bookFlight():
+    cpf = session.get('usuario');
+    flightId = int(request.args.get("id"));
+
+    flights.loadFlights();
+    flight = flights.flights[flightId];
+    if flight == None:
+        return redirect(url_for("dashboard.dashboard"));
+
+    temp = auth_service.auth_repo.loadUser(cpf)
+    if( temp == None):
+        return redirect(url_for("dashboard.dashboard"));
+
+    user : createUserDto = temp; 
+    if(user.flightsBookedIDS == None):
+        user.flightsBookedIDS = {}
+
+    if(flightId in user.flightsBookedIDS):
+        return redirect(url_for("dashboard.dashboard"));
+
+
+    user.flightsBookedIDS[flightId] = flightId;
+    auth_service.auth_repo.saveUser(user);
+
+    return redirect(url_for("dashboard.dashboard"));
+
+    
+
+

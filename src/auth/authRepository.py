@@ -2,6 +2,9 @@ import bcrypt
 import os
 import json
 from dotenv import load_dotenv
+from src.models.flights import Flight
+from src.user.userDTO.createUserDTO import createUserDto
+from Utils.Utils import Status, Privileg
 
 load_dotenv()
 
@@ -33,3 +36,66 @@ class authRepository:
 
         # CPF não encontrado
         return {'status': False, 'message': 'Usuário não encontrado'}
+
+    def loadUser(self, cpf : str):
+        try:
+            with open(self.user_db, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, FileNotFoundError):
+            return None
+
+        for u in data:
+            if u.get("cpf") == cpf:
+                # Handles both int `.value` and str `.name`
+
+                status_val = u.get("status")
+                privilege_val = u.get("privilege")
+
+
+                status = Status(status_val) if isinstance(status_val, int) else Status[status_val]
+                privilege = Privileg(privilege_val) if isinstance(privilege_val, int) else Privileg[privilege_val]
+
+                return createUserDto(
+                        cpf=u.get("cpf"),
+                        password=u.get("password"),
+                        name=u.get("name"),
+                        flightsCreated=u.get("flightsCreated"),
+                        flightsBooked=u.get("flightsBooked"),
+                        flightsBookedIDS =u.get("flightsBookedContent"),
+                        status=status,
+                        privilege=privilege
+                        )
+        return None
+
+
+    def saveUser(self, user: createUserDto):
+        try:
+            with open(self.user_db, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, FileNotFoundError):
+            data = []
+
+        # Convert DTO → dict
+        user_dict = {
+                "cpf": user.cpf,
+                "password": user.password,
+                "name": user.name,
+                "flightsCreated": user.flightsCreated,
+                "flightsBooked": user.flightsBooked,
+                "flightsBookedContent": user.flightsBookedIDS,
+                "status": user.status.value,
+                "privilege": user.privilege.value
+                }
+
+        # Update or insert
+        for i, u in enumerate(data):
+            if u.get("cpf") == user.cpf:
+                data[i] = user_dict  # update existing
+                break
+        else:
+            data.append(user_dict)  # add new user
+
+        # Save file
+        with open(self.user_db, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+

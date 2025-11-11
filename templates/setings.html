@@ -4,18 +4,6 @@
 
 {% block head %} 
 
-    <script>
-        function toggleForm() {
-            const form = document.getElementById("flightForm");
-            form.style.display = form.style.display === "block" ? "none" : "block";
-        }
-
-        function edit() {
-            const form = document.getElementById("flightForm");
-            form.style.display = form.style.display === "block" ? "none" : "block";
-        }
-    </script>
-
     <style>
 
   body {
@@ -46,7 +34,6 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
             <li class="nav-item">
-                <button class="btn btn-outline-light" type="button" onclick="toggleForm()">Add Flight</button>
                 <li class="nav-item"><a class="nav-link" href="/dashboardADM">dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" href="/auth/logout">Logout</a></li>
             </li>    

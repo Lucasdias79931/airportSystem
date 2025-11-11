@@ -31,6 +31,18 @@
       color: white;
   }
 
+  .btn-booked{
+      text-decoration: none;
+      float: right;
+      padding: 4px 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      background-color: rgba(256, 150, 150, 0.85);
+      color: white;
+  }
+
 </style>
 {% endblock %}
 
@@ -44,9 +56,18 @@
             Horário de partida: {{ flight.entryTime }}<br>
             Horário de chegada: {{ flight.exitTime }}<br>
             Preço: ${{ flight.price }}
-            <div class="flight-buttons">
-                <a class="btn-book" href="/settings/flight?id={{ flight.id }}">Comprar</a>
-            </div>
+
+            {% if session.get('usuario') %}
+                {% if bookedFlights and flight.id|string in bookedFlights %}
+                    <div class="flight-buttons">
+                        <a class="btn-booked">Comprado</a>
+                    </div>
+                {% else %}
+                    <div class="flight-buttons">
+                        <a class="btn-book" href="/dashboard/book_flight?id={{ flight.id }}">Comprar</a>
+                    </div>
+                {% endif %}
+            {% endif %}
         </div>
         {% endfor %}
     {% endblock %}
