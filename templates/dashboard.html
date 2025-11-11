@@ -2,13 +2,58 @@
 
 {% block title %}Página Inicial - FlaskApp{% endblock %}
 
-{% block navdash %}
+{% block head %}
+{{ super() }}
+<style>
+  .flights-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
 
-{% block navADM %}{% endblock %}
+  .flight {
+      background: linear-gradient(135deg, rgba(0.4, 0.36, 0.36, 0.5), rgba(0.4, 0.36, 1.0, 0.5));
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      color: white;
+  }
 
+  .btn-book{
+      text-decoration: none;
+      float: right;
+      padding: 4px 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      background-color: rgba(40, 220, 100, 0.85);
+      color: white;
+  }
 
+</style>
 {% endblock %}
 
-      
-
-
+{% block content %}
+<div class="flights-container">
+    {% if flights %}
+    {% block flights_container %}
+        {% for flight in flights.values() %}
+        <div class="flight">
+            <strong>{{ flight.source }}</strong> → <strong>{{ flight.destination }}</strong><br>
+            Horário de partida: {{ flight.entryTime }}<br>
+            Horário de chegada: {{ flight.exitTime }}<br>
+            Preço: ${{ flight.price }}
+            <div class="flight-buttons">
+                <a class="btn-book" href="/settings/flight?id={{ flight.id }}">Comprar</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% endblock %}
+    {% else %}
+         <p style="color: gray; font-size: 1.2rem; text-align: center;">
+            No flights available.
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

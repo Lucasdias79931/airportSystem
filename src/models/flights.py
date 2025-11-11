@@ -40,9 +40,10 @@ def loadFlights():
         with open("flights.bin", "rb") as f:   # "rb" = read binary
             flights = pickle.load(f)
     except FileNotFoundError:
-        a = None
+        print("error opening flights file.");
+        flights = {}
 
-    lastId = len(flights)
+    lastId = max(flights.keys(), default=0)
 
     return
 

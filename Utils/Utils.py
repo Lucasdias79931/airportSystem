@@ -20,7 +20,6 @@ load_dotenv()
 
 
 def validateCpf(cpf:str)->dict:
-    
     if cpf is None:
         return {"status":False, "msg":"CPF não fornecido para validação"}
 
@@ -45,8 +44,6 @@ def validateCpf(cpf:str)->dict:
 
 
 def verifyIfCpfExist(cpf:str):
-    
-
     cpf_numbers = re.sub(r"\D", "", cpf)
 
     db_dir = os.getenv("DATABASE")

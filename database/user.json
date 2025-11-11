@@ -7,5 +7,14 @@
         "flightsBooked": 0,
         "status": 1,
         "privilege": 2
+    },
+    {
+        "cpf": "07099473301",
+        "password": "$2b$12$eO5/h04oQfexgYP6pZpKVO2hf8Cj5fRzuMA2vx5/QuF3G2xtILj0O",
+        "name": "caliel",
+        "flightsCreated": 0,
+        "flightsBooked": 0,
+        "status": 1,
+        "privilege": 1
     }
 ]
