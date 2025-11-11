@@ -82,8 +82,8 @@
         Horário de chegada: {{ flight.exitTime }}<br>
         Preço: ${{ flight.price }}
         <div class="flight-buttons">
-            <a class="btn-edit" href="/settings/flight?id={{ flight.id }}">Editar</a>
-            <a class="btn-delete" href="/settings/delete_flight?id={{ flight.id }}">Excluir</a>
+            <a class="btn-edit" href="/dashboardADM/flight_edit?id={{ flight.id }}">Editar</a>
+            <a class="btn-delete" href="/dashboardADM/flight_delete?id={{ flight.id }}">Excluir</a>
         </div>
     </div>
     {% endfor %}

@@ -7,5 +7,6 @@ dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 @login_required
 @dashboard_bp.route('/', methods=['GET','POST'])
 def dashboard():
+    flights.loadFlights();
     if request.method == "GET":
         return render_template("dashboard.html", flights = flights.flights)

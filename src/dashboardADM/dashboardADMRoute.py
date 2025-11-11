@@ -33,3 +33,30 @@ def addFlight():
         return redirect(url_for("dashboardADM.dashboardADM"));
 
     return redirect(url_for("dashboardADM.dashboardADM"));
+
+@dashboardADM_bp.route("/flight_edit", methods=["GET", "POST"])
+def editFlight():
+    flights.loadFlights();
+    flightId = int(request.args.get("id"))
+
+    if request.method == "POST":
+        source = request.form.get("source")
+        destination = request.form.get("destination")
+        entryTime = request.form.get("entryTime")
+        exitTime = request.form.get("exitTime")
+        price = request.form.get("price")
+
+        flights.flights[flightId] = flights.Flight(flightId, price, source, destination, entryTime, exitTime)
+        flights.saveFlights();
+
+        return redirect(url_for("dashboardADM.dashboardADM"))
+
+    return render_template("flights.html", flight = flights.flights[flightId])
+
+@dashboardADM_bp.route("/flight_delete", methods=["GET", "POST"])
+def deleteFlight():
+    flightId = int(request.args.get("id"))
+    del flights.flights[flightId]
+    flights.saveFlights()
+    return redirect(url_for("dashboardADM.dashboardADM"))
+
