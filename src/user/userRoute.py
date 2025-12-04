@@ -1,14 +1,26 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from .userService import user_service
 from .createUserDTO import createUserDto
+from Utils.Utils import Status, Privileg
 
 user_bp = Blueprint("user", __name__, url_prefix='/user')
 user_service = user_service()
 
+adm = createUserDto(
+    cpf="62971312011",
+    name="lucas dos santos dias",
+    password="123",
+    privilege=Privileg.Adm,
+    status=Status.Ativo
+)
+
+try:
+    user_service.createUser(adm);
+except:
+    pass;
 
 @user_bp.route("/register", methods=["POST", "GET"])
 def register():
-   
     if request.method == "GET":
         return render_template("register.html")
 
