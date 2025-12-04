@@ -3,7 +3,8 @@ import os
 import json
 from dotenv import load_dotenv
 from src.models.flights import Flight
-from src.user.userDTO.createUserDTO import createUserDto
+from src.user.createUserDTO import createUserDto
+from src.user.userRoute import user_service 
 from Utils.Utils import Status, Privileg
 
 load_dotenv()
@@ -13,6 +14,28 @@ class authRepository:
         self.user_db = os.path.join(os.getenv("DATABASE"), "user.json")
 
     def login(self, cpf: str, password: str):
+        user : createUserDto | None = user_service.userRepository.tree.search(int(cpf))
+        if user == None: 
+            return;
+
+        if not user:
+            return {'status': False, 'message': 'Usuário não existe' }
+        
+        stored_hash : str = user.password;
+
+        # Verifica se há hash armazenado
+        if not stored_hash:
+            return {'status': False, 'message': 'Não há hashing' }
+
+
+        # Verifica a senha (hash armazenado é string, precisa codificar em bytes)
+        if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
+            return {'status': True, 'Privileg': user.privilege.value}
+        else:
+            return {'status': False, 'message': 'Senha inválida' }
+
+
+        return;
         try:
             with open(self.user_db, "r", encoding="utf-8") as f:
                 data = json.load(f)

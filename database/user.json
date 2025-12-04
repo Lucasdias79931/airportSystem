@@ -10,7 +10,7 @@
             "5": 5,
             "4": 4,
             "7": 7,
-            "6": 6
+            "8": 8
         },
         "status": 1,
         "privilege": 1
@@ -36,7 +36,8 @@
         "flightsCreated": 0,
         "flightsBooked": 0,
         "flightsBookedContent": {
-            "6": 6
+            "6": 6,
+            "7": 7
         },
         "status": 1,
         "privilege": 1

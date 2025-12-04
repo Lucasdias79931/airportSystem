@@ -1,5 +1,6 @@
 from flask import Flask, render_template, session
 from config import ConfigFlask
+import src.user.databaseTest as d;
 
 app = Flask(__name__)
 ConfigFlask.configApp(app)

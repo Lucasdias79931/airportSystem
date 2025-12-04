@@ -2,7 +2,7 @@ from flask import Blueprint, request, render_template, session, redirect, url_fo
 from Utils.Utils import login_required
 import src.models.flights as flights
 from src.auth.authRoute import auth_service 
-from src.user.userDTO.createUserDTO import createUserDto
+from src.user.createUserDTO import createUserDto
 import json
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")

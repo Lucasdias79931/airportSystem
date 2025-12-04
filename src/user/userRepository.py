@@ -1,28 +1,46 @@
-from dataclasses import dataclass
-import bcrypt
+import os, json, bcrypt
+from dotenv import load_dotenv
+from src.user.createUserDTO import createUserDto
+from src.user.database import DiskBTree
 
-@dataclass
-class CreateUserDto:
-    NAME: str
-    CPF: str
-    AGE: int
-    PASSWORD: str
-    EMAIL: str
-
+load_dotenv()
 
 class UserRepository:
-    def __init__(self, user_dbPath):
-        self.csv_file = user_dbPath
-        self.lock_file = self.csv_file + ".lock"
+    tree : DiskBTree;
 
-        
-    def create(self, user: CreateUserDto):
-        # valida se CPF já existe
-        if any(u['CPF'] == user.CPF for u in self.user_db):
-            raise ValueError("CPF já cadastrado")
+    def __init__(self):
+        #self.user_db = os.path.join(os.getenv("DATABASE"), "user.json")
 
-        # valida campos obrigatórios
-        for field in user.__dataclass_fields__:
-            value = getattr(user, field)
-            if value is None or value == "":
-                raise ValueError(f"Campo obrigatório ausente: {field}")
+        self.tree = DiskBTree(path=os.getenv("DATABASE"), t=16)
+
+
+    def save(self, user: createUserDto):
+        user.password = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8");
+        self.tree.insert(int(user.cpf), user);
+
+        return;
+        os.makedirs(os.path.dirname(self.user_db), exist_ok=True)
+
+        if os.path.exists(self.user_db):
+            with open(self.user_db, "r", encoding="utf-8") as f:
+                try:
+                    data = json.load(f)
+                except json.JSONDecodeError:
+                    data = []
+        else:
+            data = []
+
+        data.append({
+            "cpf": user.cpf,
+            "password": bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8"),
+            "name": user.name,
+            "flightsCreated": user.flightsCreated,
+            "flightsBooked": user.flightsBooked,
+            "status": user.status.value if hasattr(user.status, "value") else user.status,
+            "privilege": user.privilege.value if hasattr(user.privilege, "value") else user.privilege
+        })
+
+        with open(self.user_db, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
+        return {"message": "User saved successfully!"}

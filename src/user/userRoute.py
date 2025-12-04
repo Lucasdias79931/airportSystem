@@ -1,9 +1,9 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
-from .userService import userService
-from .userDTO.createUserDTO import createUserDto
+from .userService import user_service
+from .createUserDTO import createUserDto
 
 user_bp = Blueprint("user", __name__, url_prefix='/user')
-user_service = userService()
+user_service = user_service()
 
 
 @user_bp.route("/register", methods=["POST", "GET"])

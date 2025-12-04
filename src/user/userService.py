@@ -1,11 +1,23 @@
 import os, sys
-from Utils.Utils import validateCpf, verifyIfCpfExist
-from .userDTO.createUserDTO import createUserDto
-from .userDTO.userRepository import UserRepository
+from Utils.Utils import validateCpf
+from .createUserDTO import createUserDto
+from .userRepository import UserRepository
+import re
 
-class userService:
+class user_service:
+    userRepository : UserRepository;
+
     def __init__(self):
         self.userRepository = UserRepository()
+
+    def cpfExists(self, cpf:str) -> bool:
+        #cpf_numbers = re.sub(r"\D", "", cpf)
+        cpf_numbers = int(cpf)
+
+        if self.userRepository.tree.search(cpf_numbers) == None:
+            return False
+        else:
+            return True 
 
     def createUser(self, user: createUserDto):
         # Validate CPF format and checksum
@@ -14,7 +26,7 @@ class userService:
             raise ValueError("Invalid CPF")
 
         # Check duplicate
-        if verifyIfCpfExist(user.cpf):
+        if self.cpfExists(user.cpf):
             raise ValueError("CPF already exists in the system")
 
         # Use normalized CPF
