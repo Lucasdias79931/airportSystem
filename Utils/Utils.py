@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 from flask import flash, session, redirect, url_for
 
-class Privileg(Enum):
+class Privilege(Enum):
     Normal = 1
     Adm = 2
 

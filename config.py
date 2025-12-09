@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
 from datetime import timedelta
 from src.home.homeRoute import home_bp
-from src.auth.authRoute import auth_bp
+from src.user.authRoute import auth_bp
+from src.user.registerRoute import user_bp
 from src.settings.settingsRoute import settings_bp
-from src.user.userRoute import user_bp
 from src.dashboard.dashboardRoute import dashboard_bp
 from src.dashboardADM.dashboardADMRoute import dashboardADM_bp
 import os

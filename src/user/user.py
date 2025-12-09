@@ -1,10 +1,10 @@
-from dataclasses import dataclass, field
-import os, sys
 from typing import Dict
-from Utils.Utils import Status, Privileg
+from dataclasses import dataclass, field
+
+from Utils.Utils import Status, Privilege
 
 @dataclass
-class createUserDto:
+class User:
     cpf: str
     name: str
     password: str
@@ -12,4 +12,4 @@ class createUserDto:
     flightsBooked: int = 0
     flightsBookedIDS: Dict[int, int] = field(default_factory=dict) 
     status: Status = Status.Ativo
-    privilege: Privileg = Privileg.Normal
+    privilege: Privilege = Privilege.Normal

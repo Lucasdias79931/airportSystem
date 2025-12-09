@@ -1,8 +1,8 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash
 from Utils.Utils import login_required
 import src.models.flights as flights
-from src.auth.authRoute import auth_service 
-from src.user.createUserDTO import createUserDto
+from src.user.authRoute import userService 
+from src.user.user import User
 import json
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
@@ -12,12 +12,12 @@ dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 def dashboard():
     cpf = session.get('usuario');
 
-    user : createUserDto | None = auth_service.auth_repo.loadUser(cpf);
+    user : User | None = userService.loadUser(cpf);
     if(user == None):
         return render_template("dashboard.html", flights = flights.flights, bookedFlights = None);
 
     flights.loadFlights();
-    print(user.flightsBookedIDS);
+    print("Viagens compradas pelo usuário: ", user.flightsBookedIDS);
     if request.method == "GET":
         return render_template("dashboard.html", flights = flights.flights, bookedFlights = user.flightsBookedIDS);
 
@@ -33,11 +33,11 @@ def bookFlight():
     if flight == None:
         return redirect(url_for("dashboard.dashboard"));
 
-    temp = auth_service.auth_repo.loadUser(cpf)
+    temp = userService.loadUser(cpf)
     if( temp == None):
         return redirect(url_for("dashboard.dashboard"));
 
-    user : createUserDto = temp; 
+    user : User = temp; 
     if(user.flightsBookedIDS == None):
         user.flightsBookedIDS = {}
 
@@ -46,7 +46,7 @@ def bookFlight():
 
 
     user.flightsBookedIDS[flightId] = flightId;
-    auth_service.auth_repo.saveUser(user);
+    userService.saveUser(user);
 
     return redirect(url_for("dashboard.dashboard"));
 

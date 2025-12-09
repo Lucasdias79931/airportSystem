@@ -58,7 +58,7 @@
             Preço: ${{ flight.price }}
 
             {% if session.get('usuario') %}
-                {% if bookedFlights and flight.id|string in bookedFlights %}
+                {% if bookedFlights and flight.id in bookedFlights %}
                     <div class="flight-buttons">
                         <a class="btn-booked">Comprado</a>
                     </div>

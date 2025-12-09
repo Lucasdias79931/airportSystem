@@ -4,7 +4,6 @@ import src.models.flights as flights;
 
 dashboardADM_bp = Blueprint("dashboardADM", __name__, url_prefix="/dashboardADM")
 
-
 @admin_required
 @dashboardADM_bp.route('/', methods=['GET','POST'])
 def dashboardADM():
