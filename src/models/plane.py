@@ -1,6 +1,9 @@
 import math
 import random
 
+from itertools import count
+from typing import List, Tuple
+from heapq import heappush, heappop
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 
@@ -10,6 +13,8 @@ from dataclasses import dataclass, field
 #continuar sendo uma string
 
 systemTime : datetime = datetime.now();
+counter = count()
+
 
 cityNames: list[str] = [
     "Rio Branco",
@@ -61,20 +66,31 @@ class Coordinate:
     longitude : float = 0;
 
 #Cidade
-@dataclass
+@dataclass(eq=False)
 class Airport:
     name : str = "Cidade";
     routes : list["Airport"] = field(default_factory=list);
     flights : list["FlightSegment"] = field(default_factory=list);
     planes : list[Plane] = field(default_factory=list);
-    coordinate : Coordinate = Coordinate();
+    coordinate : Coordinate = field(default_factory=Coordinate);
+
+    def __hash__(self):
+        return id(self)
+
+    def __repr__(self):
+        return f"Airport({self.name})"
 
 @dataclass
 class FlightSegment:
-    route: Airport | None = None;
+    origin: Airport | None = None;
+    destination: Airport | None = None;
     plane: Plane | None = None;
-    departure: datetime = datetime(year=0, month=0, day=0, hour=0);
-    arrival: datetime = datetime(year=0, month=0, day=0, hour=0);
+    departure: datetime = datetime(year=1000, month=1, day=1, hour=0);
+    arrival: datetime = datetime(year=1000, month=1, day=1, hour=0);
+
+    def __repr__(self):
+        return f"{self.plane.airport.name} -> {self.destination.name} ({self.departure:%H:%M})" if self.plane  and self.plane.airport and self.destination else "";
+
 
 def distance(a: Coordinate, b: Coordinate) -> float:
     R = 6371.0
@@ -103,7 +119,7 @@ class AirportSystem:
         airport.planes.append(plane);
         pass;
 
-    def sortedAirports(self, a : Airport) -> list[Airport]:
+    def sortedAirportsDistances(self, a : Airport) -> list[Airport]:
         return sorted( (b for b in self.airports if b != a), key=lambda b: distance(a.coordinate, b.coordinate));
 
     #Essa função faz com que aeroportos perto tenham rotas para
@@ -111,62 +127,114 @@ class AirportSystem:
     def makeAirportRoutes(self, airportA : Airport, n : int):
         n -= len(airportA.routes);
 
-        sorted = self.sortedAirports(airportA);
-        for _ in range(0, n):
-            for airportB in sorted:
-                if not airportB in airportA.routes:
-                    airportA.routes.append(airportB);
+        sorted = self.sortedAirportsDistances(airportA);
+        i : int = 0;
+        for airportB in sorted:
+            if not airportB in airportA.routes:
+                airportA.routes.append(airportB);
 
-                if not airportA in airportB.routes:
-                    airportB.routes.append(airportA);
+            if not airportA in airportB.routes:
+                airportB.routes.append(airportA);
 
-    from datetime import timedelta
+            i += 1;
+            if n < i: 
+                break;
 
     def makePlaneRoutes(self, plane: Plane, daysForward: int, startTime : datetime):
         if plane.airport is None:
-            return
+            return;
 
-        current = plane.airport
+        currentAirport : Airport = plane.airport;
 
-        speed = plane.model.speedkmh if plane.model else 800
+        speed = plane.model.speedkmh if plane.model else 800;
 
-        limitTime = systemTime + timedelta(days=daysForward)
+        limitTime = startTime + timedelta(days=daysForward);
 
-        currentTime = startTime
+        currentTime = startTime;
 
+        restTime : float = 1;
+
+        index : int = 0;
         while currentTime < limitTime:
-            if not current.routes:
-                break
+            index+=1;
+            if not currentAirport.routes:
+                break;
 
-            nextAirport = random.choice(current.routes)
+            nextAirport : Airport = random.choice(currentAirport.routes);
 
             # distância e tempo
-            dist = distance(current.coordinate, nextAirport.coordinate)
-            hours = dist / speed
-            travelTime = timedelta(hours=hours)
+            dist : float = distance(currentAirport.coordinate, nextAirport.coordinate);
+            constantDelay : float = 0.25;
+            hours : float = dist / speed + constantDelay;
+            travelTime : timedelta = timedelta(hours=hours);
 
-            departure = currentTime
-            arrival = currentTime + travelTime
+            departure : datetime = currentTime;
+            arrival : datetime = currentTime + travelTime;
 
             if arrival > limitTime:
-                break
+                break;
 
             flight = FlightSegment(
-                route=nextAirport,
+                destination=nextAirport,
                 plane=plane,
                 departure=departure,
                 arrival=arrival
-            )
+            );
 
-            current.flights.append(flight)
-            plane.flights.append(flight)
+            currentAirport.flights.append(flight);
+            plane.flights.append(flight);
 
-            current = nextAirport
-            currentTime = arrival
+            currentAirport = nextAirport;
+            currentTime = arrival + timedelta(hours=restTime);
+        
+        print("index: ", index);
 
-        plane.airport = current
+        plane.airport = currentAirport;
 
+    def getAirportByName(self, name : str) -> Airport | None:
+        for airport in self.airports:
+            if airport.name.lower() == name.lower():
+                return airport;
 
+        return None;
+
+    def findShortestPath( self, origin: Airport, destination: Airport, start_time: datetime) -> list[FlightSegment] | None:
+        # Min-heap ordered by earliest arrival time
+        queue: list[tuple[datetime, int, Airport, list[FlightSegment]]] = []
+        heappush(queue, (start_time, next(counter), origin, []))
+
+        best: dict[Airport, datetime] = {origin: start_time}
+
+        while queue:
+            print(len(queue));
+            current_time, _, airport, path = heappop(queue)
+
+            # Destination reached
+            if airport == destination:
+                return path;
+
+            # Explore outgoing flights
+            for flight in airport.flights:
+                if not flight.destination:
+                    continue;
+                if flight.origin != airport:
+                    continue;
+
+                # Must depart after we arrive
+                if flight.departure < current_time:
+                    continue
+
+                arrival = flight.arrival
+                next_airport = flight.destination
+
+                # If we already found a faster way to this airport, skip
+                if next_airport in best and best[next_airport] <= arrival:
+                    continue
+
+                best[next_airport] = arrival
+                heappush(queue, (arrival, next(counter), next_airport, path + [flight]))
+
+        return None
 
 airportSystem : AirportSystem = AirportSystem();
 
@@ -206,12 +274,23 @@ defaultPlaneModel.assentos = [False] * 64;
 #    airportSystem.planes.append(Plane(defaultPlaneModel));
 
 for airport in airportSystem.airports:
-    airport.planes = [ Plane(model=defaultPlaneModel) for _ in range(random.randint(0, 5)) ]
+    airport.planes.append(Plane(model=defaultPlaneModel, airport=airport))
 
 for airport in airportSystem.airports:
-    airportSystem.makeAirportRoutes(airport, random.randint(1, 4));
+    airportSystem.makeAirportRoutes(airport, 2);
 
 for airport in airportSystem.airports:
     for plane in airport.planes:
-        airportSystem.makePlaneRoutes(plane, 5, systemTime);
+        airportSystem.makePlaneRoutes(plane, 1, systemTime);
 
+for a in airportSystem.airports:
+    for b in airportSystem.airports:
+        if a == b: continue;
+        print(f"A amount of routes: {len(a.routes)}.");
+        print(f"A amount of flightsegments: {len(a.flights)}.");
+
+        print(f"B amount of routes: {len(b.routes)}.");
+        print(f"B amount of flightsegments: {len(b.flights)}.");
+
+        availableFlights = airportSystem.findShortestPath(a, b, systemTime + timedelta());
+        print(f"Voo possível entre {a.name} e {b.name}: ", availableFlights);

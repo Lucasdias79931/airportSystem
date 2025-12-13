@@ -1,0 +1,89 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Users</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 16px; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
+    th { background: #f4f6f8; }
+    tr:nth-child(even) { background: #fafafa; }
+    .mono { font-family: monospace; }
+    #searchBox {
+      width: 300px;
+      padding: 8px;
+      font-size: 15px;
+      border: 1px solid #bbb;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>All Users</h1>
+
+  <!-- 🔍 SEARCH BAR -->
+  <input
+    type="text"
+    id="searchBox"
+    placeholder="Search by CPF or Name..."
+    onkeyup="filterUsers()"
+  >
+
+  {% if not users %}
+    <p><i>No users found.</i></p>
+  {% else %}
+
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>CPF</th>
+        <th>Name</th>
+        <th>Password</th>
+        <th>Flights Created</th>
+        <th>Flights Booked</th>
+        <th>Booked IDs</th>
+        <th>Status</th>
+        <th>Privilege</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.cpf }}</td>
+        <td>{{ u.name }}</td>
+        <td>{{ u.password }}</td>
+        <td>{{ u.flightsCreated }}</td>
+        <td>{{ u.flightsBooked }}</td>
+        <td class="mono">{{ u.flightsBookedIDS }}</td>
+        <td>{{ u.status.name }}</td>
+        <td>{{ u.privilege.name }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% endif %}
+
+<script>
+function filterUsers() {
+    let filter = document.getElementById("searchBox").value.toLowerCase();
+    let rows = document.querySelectorAll("#usersTable tbody tr");
+
+    rows.forEach(row => {
+        let cpf = row.cells[0].textContent.toLowerCase();
+        let name = row.cells[1].textContent.toLowerCase();
+
+        if (cpf.includes(filter) || name.includes(filter)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+</script>
+
+</body>
+</html>
+

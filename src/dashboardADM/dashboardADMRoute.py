@@ -1,6 +1,9 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash
 from Utils.Utils import admin_required
+from src.user.userService import userService;
+
 import src.models.flights as flights;
+
 
 dashboardADM_bp = Blueprint("dashboardADM", __name__, url_prefix="/dashboardADM")
 
@@ -59,3 +62,8 @@ def deleteFlight():
     flights.saveFlights()
     return redirect(url_for("dashboardADM.dashboardADM"))
 
+@admin_required
+@dashboardADM_bp.route('/users', methods=['GET','POST'])
+def getUsers():
+    if request.method == "GET":
+        return render_template("usersManagement.html", users = userService.tree.getAll())

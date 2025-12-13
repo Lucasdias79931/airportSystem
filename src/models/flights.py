@@ -1,4 +1,5 @@
 import pickle
+import src.models.plane as plane
 
 class Flight:
     #inteiros
