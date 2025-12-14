@@ -1,6 +1,7 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash, Response
 from ..models import flights 
 from Utils.Utils import admin_required
+from src.user.userService import userService;
 
 settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 
@@ -9,3 +10,9 @@ settings_bp = Blueprint("settings", __name__, url_prefix="/settings")
 def settings():
     return render_template("setings.html", usuario=session["usuario"], flights = flights.flights)
 
+
+@admin_required
+@settings_bp.route('/users', methods=['GET','POST'])
+def getUsers():
+    if request.method == "GET":
+        return render_template("usersManagement.html", users = userService.tree.getAll())
