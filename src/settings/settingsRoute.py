@@ -21,5 +21,7 @@ def getUsers():
     else:
         users = userService.treeCPF.getAll()
 
+
+
     return render_template("usersManagement.html", users=users, order=order)
 
