@@ -9,9 +9,12 @@ from .user import User
 
 class UserService:
     tree : DiskBTree;
-
+    treeName: DiskBTree
     def __init__(self):
-        self.tree = DiskBTree(path=os.getenv("DATABASE"), t=16)
+        base = os.getenv("DATABASE")
+
+        self.treeCPF = DiskBTree(path=os.path.join(base, "cpf"), t=16)
+        self.treeName = DiskBTree(path=os.path.join(base, "name"), t=16)
 
     def cpfExists(self, cpf:str) -> bool:
         #cpf_numbers = re.sub(r"\D", "", cpf)
@@ -21,54 +24,91 @@ class UserService:
             return False
         else:
             return True 
+    def normalize_name(self, name: str) -> str:
+        return name.strip().lower()
 
-    def createUser(self, user: User): # Validate CPF format and checksum
+    def createUser(self, user: User):
         cpf_validated = validateCpf(user.cpf)
-        if not cpf_validated['status']:
+        if not cpf_validated["status"]:
             raise ValueError("Invalid CPF")
 
-        # Check duplicate
-        if self.cpfExists(user.cpf):
-            raise ValueError("CPF already exists in the system")
+        user.cpf = cpf_validated["cpf"]
 
-        # Use normalized CPF
-        user.cpf = cpf_validated['cpf']
+        if self.treeCPF.search(int(user.cpf)):
+            raise ValueError("CPF already exists")
 
-        # Persist user
-        user.password = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8");
-        self.tree.insert(int(user.cpf), user);
+        user.password = bcrypt.hashpw(
+            user.password.encode(), bcrypt.gensalt()
+        ).decode()
 
-        return {"message": "User created successfully!"}
+        self.treeCPF.insert(int(user.cpf), user)
+
+        name_key = self.normalize_name(user.name)
+
+        cpfs = self.treeName.search(name_key)
+        if cpfs is None:
+            self.treeName.insert(name_key, [int(user.cpf)])
+        else:
+            cpfs.append(int(user.cpf))
+            self.treeName.update(name_key, cpfs)
+    
+    def findByName(self, name: str) -> list[User]:
+        name_key = self.normalize_name(name)
+
+        cpfs = self.treeName.search(name_key)
+        if not cpfs:
+            return []
+
+        return [self.treeCPF.search(cpf) for cpf in cpfs]
+
+    def getAllByName(self) -> list[User]:
+        users = []
+        name_index = self.treeName.getAll()  # já vem ordenado por nome
+
+        for cpf_list in name_index:
+            for cpf in cpf_list:
+                users.append(self.treeCPF.search(cpf))
+
+        return users
+
+
 
     def login(self, data : Dict):
-        cpf = data.get("cpf")
-        password = data.get("password")
+        try:
+            cpf = data.get("cpf")
+            password = data.get("password")
 
-        if not cpf or not password:
-            raise ValueError("CPF ou senha não preenchidos!")
+            if not cpf or not password:
+                raise ValueError("CPF ou senha não preenchidos!")
 
-        user : User | None = userService.tree.search(int(cpf))
-        if not user:
-            raise ValueError('Usuário não existe');
-        
-        storedHash : str = user.password;
+            user : User | None = self.treeCPF.search(int(cpf))
+            if not user:
+                raise ValueError('Usuário não existe');
+            
+            storedHash : str = user.password;
 
-        # Verifica se há hash armazenado
-        if not storedHash:
-            raise ValueError('Não há hashing');
+            # Verifica se há hash armazenado
+            if not storedHash:
+                raise ValueError('Não há hashing');
 
-        # Verifica a senha (hash armazenado é string, precisa codificar em bytes)
-        if not bcrypt.checkpw(password.encode("utf-8"), storedHash.encode("utf-8")):
-            raise ValueError('Senha inválida')
+            # Verifica a senha (hash armazenado é string, precisa codificar em bytes)
+            if not bcrypt.checkpw(password.encode("utf-8"), storedHash.encode("utf-8")):
+                raise ValueError('Senha inválida')
 
-        session["usuario"] = cpf;
-        session["privilege"] = user.privilege.value; 
-        return user.privilege.value;
+            session["usuario"] = cpf;
+            session["privilege"] = user.privilege.value; 
+            return user.privilege.value;
 
-    def loadUser(self, cpf : str) -> User | None:
-        return self.tree.search(int(cpf));
+        except Exception as e:
+            raise
+
+
+    def findByCpf(self, cpf : str) -> User | None:
+        return self.treeCPF.search(int(cpf));
 
     def saveUser(self, user: User):
-        self.tree.update(int(user.cpf), user);
+        self.treeCPF.update(int(user.cpf), user);
+        self.treeName.update(user.name, user);
 
-userService = UserService();
+
+userService = UserService()

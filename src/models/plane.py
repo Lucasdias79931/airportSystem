@@ -268,6 +268,7 @@ class AirportSystem:
 
 airportSystem : AirportSystem = AirportSystem();
 
+defaultPlaneModel : PlaneModel = PlaneModel();
 airportSystem.airports.append(Airport(name="Rio Branco",        coordinate=Coordinate(-9.97499, -67.8243)))
 airportSystem.airports.append(Airport(name="Maceió",            coordinate=Coordinate(-9.66599, -35.7350)))
 airportSystem.airports.append(Airport(name="Macapá",            coordinate=Coordinate(0.034934, -51.0694)))
@@ -327,6 +328,10 @@ import folium
 from folium.plugins import PolyLineTextPath
 
 m = folium.Map(location=[-14.2, -51.9], zoom_start=4)
+start = (-23.53, -46.63)  # São Paulo
+end   = (-22.91, -43.20)  # Rio
+m = folium.Map(location=[-14.2, -51.9], zoom_start=4)
+
 start = (-23.53, -46.63)  # São Paulo
 end   = (-22.91, -43.20)  # Rio
 

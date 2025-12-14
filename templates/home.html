@@ -1,4 +1,30 @@
-{% extends "dashboard.html" %}
+{% extends "base.html" %}
+
+{% block title %}Página Inicial - FlaskApp{% endblock %}
+
+{% block head %} 
+<style>
+  body, html {
+    height: 100%;
+    margin: 0;
+  }
+  body {
+    background: url("{{ url_for('static', filename='images/background.jpg') }}") no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    text-shadow: 1px 1px 3px black;
+  }
+  .overlay {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+</style>
+{% endblock %}
 
 {% block nav %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100">
@@ -21,6 +47,47 @@
     </div>
   </div>
 </nav>
+{% endblock %}
+
+{% block items %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    
+    {% for flight in flights.values() %}
+    <div class="col-md-6 col-lg-4 mb-4">
+      <div class="card text-dark shadow h-100">
+        <div class="card-body d-flex flex-column text-center">
+          
+          <h5 class="card-title">
+            {{ flight.source }} → {{ flight.destination }}
+          </h5>
+
+          <p class="card-text mb-1">
+            <strong>Partida:</strong> {{ flight.entryTime }}
+          </p>
+
+          <p class="card-text mb-1">
+            <strong>Chegada:</strong> {{ flight.exitTime }}
+          </p>
+
+          <p class="card-text fs-5 fw-bold mt-2">
+            ${{ flight.price }}
+          </p>
+
+          <div class="mt-auto">
+            <a href="/settings/flight?id={{ flight.id }}"
+               class="btn btn-primary w-100">
+              Buy
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
 {% endblock %}
 
 
