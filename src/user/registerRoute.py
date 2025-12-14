@@ -12,7 +12,6 @@ adm = User(
     privilege=Privilege.Adm,
     status=Status.Ativo
 );
-
 try:
     userService.createUser(adm);
 except:

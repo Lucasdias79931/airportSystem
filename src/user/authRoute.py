@@ -1,8 +1,10 @@
 from flask import Blueprint, request, render_template, session, redirect, url_for, flash
-from .userService import userService
+from .userService import UserService
 from Utils.Utils import Privilege
-
+import traceback
 auth_bp = Blueprint("auth", __name__, url_prefix='/auth')
+
+userService = UserService()
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
@@ -26,7 +28,9 @@ def login():
             return redirect(url_for("auth.login"))
         
     except Exception as e:
+        
         flash("Ocorreu um erro interno. Tente novamente mais tarde.", "danger")
+        
         print(f"[ERRO LOGIN] {e}")  
         return redirect(url_for("auth.login"))
 

@@ -12,7 +12,7 @@ dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 def dashboard():
     cpf = session.get('usuario');
 
-    user : User | None = userService.loadUser(cpf);
+    user : User | None = userService.findByCpf(cpf);
     if(user == None):
         return render_template("dashboard.html", flights = flights.flights, bookedFlights = None);
 
@@ -33,7 +33,7 @@ def bookFlight():
     if flight == None:
         return redirect(url_for("dashboard.dashboard"));
 
-    temp = userService.loadUser(cpf)
+    temp = userService.findByCpf(cpf)
     if( temp == None):
         return redirect(url_for("dashboard.dashboard"));
 

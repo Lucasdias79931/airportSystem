@@ -13,6 +13,14 @@ def settings():
 
 @admin_required
 @settings_bp.route('/users', methods=['GET','POST'])
+@settings_bp.route('/users')
 def getUsers():
-    if request.method == "GET":
-        return render_template("usersManagement.html", users = userService.tree.getAll())
+    order = request.args.get("order", "cpf")
+
+    if order == "name":
+        users = userService.getAllByName()
+    else:
+        users = userService.treeCPF.getAll()
+
+    return render_template("usersManagement.html", users=users, order=order)
+
