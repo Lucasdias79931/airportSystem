@@ -48,13 +48,13 @@ cityNames: list[str] = [
 
 @dataclass
 class PlaneModel:
-    assentos : list[bool] = field(default_factory=list);
+    amountOfSeats : int = 60;
     speedkmh : float = 800;
-    costKm : float = 30;
+    costKm : float = 0.05;
 
 @dataclass
 class Plane:
-    model : PlaneModel | None = None;
+    model : PlaneModel;
     airport : "Airport | None" = None;
     flights : list["FlightSegment"] = field(default_factory=list);
 
@@ -85,20 +85,22 @@ class FlightSegment:
     origin : Airport;
     destination: Airport;
     plane: Plane;
+    price : float;
     departure: datetime = datetime(year=1000, month=1, day=1, hour=0);
     arrival: datetime = datetime(year=1000, month=1, day=1, hour=0);
+    seatsTaken : int = 0;
 
     def __repr__(self):
         return f"{self.plane.airport.name} -> {self.destination.name} ({self.departure:%H:%M})" if self.plane  and self.plane.airport and self.destination else "";
 
 @dataclass 
-class Purchase:
+class Flight:
     path : list[FlightSegment];
 
-    price : int = 0;
+    price : float;
 
-    departure: datetime = datetime(year=1000, month=1, day=1, hour=0);
-    arrival: datetime = datetime(year=1000, month=1, day=1, hour=0);
+    departure: datetime;
+    arrival: datetime;
 
 
 def distance(a: Coordinate, b: Coordinate) -> float:
@@ -183,12 +185,14 @@ class AirportSystem:
             if arrival > limitTime:
                 break;
 
+            price : float = dist * plane.model.costKm;
             flight = FlightSegment(
                 origin=currentAirport,
                 destination=nextAirport,
                 plane=plane,
                 departure=departure,
-                arrival=arrival
+                arrival=arrival,
+                price = price
             );
 
             currentAirport.flights.append(flight);
@@ -227,6 +231,8 @@ class AirportSystem:
                 assert flight.origin == airport;
                 if not flight.destination:
                     continue;
+                if flight.seatsTaken >= flight.plane.model.amountOfSeats:
+                    continue;
 
                 # Must depart after we arrive
                 if flight.departure < current_time:
@@ -243,6 +249,22 @@ class AirportSystem:
                 heappush(queue, (arrival, next(counter), next_airport, path + [flight]))
 
         return None
+
+    def getShortestFlight(self, origin: Airport, destination: Airport, start_time: datetime):
+        flights : list[FlightSegment] | None = self.findShortestPath(origin, destination, start_time);
+        if flights == None: 
+            return None;
+        price: float = 0;
+        departure: datetime = flights[0].departure;
+        arrival: datetime = flights[0].arrival;
+        for f in flights:
+            price += f.price;
+            arrival += f.arrival - arrival;
+            arrival += f.arrival - f.departure;
+        flight : Flight = Flight(path = flights, price=price, departure=departure, arrival=arrival);
+
+        return flight;
+
 
 airportSystem : AirportSystem = AirportSystem();
 
@@ -275,7 +297,6 @@ airportSystem.airports.append(Airport(name="Aracaju",           coordinate=Coord
 airportSystem.airports.append(Airport(name="Palmas",            coordinate=Coordinate(-10.24,   -48.3558)))
 
 defaultPlaneModel : PlaneModel = PlaneModel();
-defaultPlaneModel.assentos = [False] * 64;
 
 for airport in airportSystem.airports:
     airport.planes.append(Plane(model=defaultPlaneModel, airport=airport))
@@ -306,7 +327,6 @@ import folium
 from folium.plugins import PolyLineTextPath
 
 m = folium.Map(location=[-14.2, -51.9], zoom_start=4)
-
 start = (-23.53, -46.63)  # São Paulo
 end   = (-22.91, -43.20)  # Rio
 

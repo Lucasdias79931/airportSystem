@@ -1,15 +1,18 @@
-from flask import Blueprint, request, render_template, session, redirect, url_for, flash
-from Utils.Utils import login_required
 import src.models.flights as flights
+import json
+
+from flask import Blueprint, request, render_template, session, redirect, url_for, flash, Flask
+from Utils.Utils import login_required
 from src.user.authRoute import userService 
 from src.user.user import User
-import json
+from datetime import datetime
+from src.models.plane import airportSystem;
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 @login_required
-@dashboard_bp.route('/', methods=['GET','POST'])
-def dashboard():
+@dashboard_bp.route('/i', methods=['GET','POST'])
+def dashboardi():
     cpf = session.get('usuario');
 
     user : User | None = userService.loadUser(cpf);
@@ -50,6 +53,38 @@ def bookFlight():
 
     return redirect(url_for("dashboard.dashboard"));
 
-    
 
+@dashboard_bp.route("/", methods=['GET', 'POST'])
+def dashboard():
+    airports = [a.name for a in airportSystem.airports]
+    path = None
+    error = None
+
+    if request.method == "POST":
+        try:
+            origin_name = request.form["origin"]
+            dest_name = request.form["destination"]
+            departure = datetime.fromisoformat(request.form["departure"])
+
+            origin = airportSystem.getAirportByName(origin_name)
+            dest = airportSystem.getAirportByName(dest_name)
+
+            if not origin or not dest:
+                error = "Invalid airport name."
+            else:
+                path = airportSystem.getShortestFlight(
+                    origin, dest, departure
+                )
+                if not path:
+                    error = "No available route for the selected time."
+
+        except Exception as e:
+            error = "Invalid search parameters."
+
+    return render_template(
+        "dashboard_cool.html",
+        airports=airports,
+        path=path,
+        error=error
+    )
 
