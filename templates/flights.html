@@ -1,0 +1,62 @@
+{% extends "home.html" %}
+
+{%block head %}
+    {{super()}}
+    <style>
+        .form-container {
+            padding: 25px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            background-color: rgb(42, 150, 87);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin-top: 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: rgb(35, 130, 75);
+        }
+    </style>
+{%endblock%}
+
+{% block content %}
+<body>
+<div class="form-container">
+    <form method="POST" action="{{ url_for("dashboardADM.editFlight", id=flight.id)}}">
+        <label>Origem</label>
+        <input type="text" name="source" value="{{ flight.source }}" required>
+
+        <label>Destino</label>
+        <input type="text" name="destination" value="{{ flight.destination }}" required>
+
+        <label>Horário de Partida</label>
+        <input type="text" name="entryTime" value="{{ flight.entryTime }}" required>
+
+        <label>Horário de Chegada</label>
+        <input type="text" name="exitTime" value="{{ flight.exitTime }}" required>
+
+        <label>Preço</label>
+        <input type="number" name="price" step="0.01" value="{{ flight.price }}" required>
+
+        <button type="submit">Salvar Alterações</button>
+    </form>
+</div>
+
+</body>
+</html>
+{% endblock%}

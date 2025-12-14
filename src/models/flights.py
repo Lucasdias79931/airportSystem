@@ -1,13 +1,14 @@
 import pickle
+import src.models.plane as plane
 
 class Flight:
     #inteiros
-    id = None
-    price = None
+    id : int
+    price : int
 
     #Strings 
-    source = None
-    destination = None 
+    source : str
+    destination : str
 
     #datas/tempo
     entryTime = None
@@ -40,9 +41,10 @@ def loadFlights():
         with open("flights.bin", "rb") as f:   # "rb" = read binary
             flights = pickle.load(f)
     except FileNotFoundError:
-        a = None
+        print("error opening flights file.");
+        flights = {}
 
-    lastId = len(flights)
+    lastId = max(flights.keys(), default=0)
 
     return
 

@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 from flask import flash, session, redirect, url_for
 
-class Privileg(Enum):
+class Privilege(Enum):
     Normal = 1
     Adm = 2
 
@@ -20,7 +20,6 @@ load_dotenv()
 
 
 def validateCpf(cpf:str)->dict:
-    
     if cpf is None:
         return {"status":False, "msg":"CPF não fornecido para validação"}
 
@@ -45,8 +44,6 @@ def validateCpf(cpf:str)->dict:
 
 
 def verifyIfCpfExist(cpf:str):
-    
-
     cpf_numbers = re.sub(r"\D", "", cpf)
 
     db_dir = os.getenv("DATABASE")
