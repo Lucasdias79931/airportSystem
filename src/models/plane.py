@@ -82,14 +82,23 @@ class Airport:
 
 @dataclass
 class FlightSegment:
-    origin: Airport | None = None;
-    destination: Airport | None = None;
-    plane: Plane | None = None;
+    origin : Airport;
+    destination: Airport;
+    plane: Plane;
     departure: datetime = datetime(year=1000, month=1, day=1, hour=0);
     arrival: datetime = datetime(year=1000, month=1, day=1, hour=0);
 
     def __repr__(self):
         return f"{self.plane.airport.name} -> {self.destination.name} ({self.departure:%H:%M})" if self.plane  and self.plane.airport and self.destination else "";
+
+@dataclass 
+class Purchase:
+    path : list[FlightSegment];
+
+    price : int = 0;
+
+    departure: datetime = datetime(year=1000, month=1, day=1, hour=0);
+    arrival: datetime = datetime(year=1000, month=1, day=1, hour=0);
 
 
 def distance(a: Coordinate, b: Coordinate) -> float:
@@ -175,6 +184,7 @@ class AirportSystem:
                 break;
 
             flight = FlightSegment(
+                origin=currentAirport,
                 destination=nextAirport,
                 plane=plane,
                 departure=departure,
@@ -198,7 +208,7 @@ class AirportSystem:
 
         return None;
 
-    def findShortestPath( self, origin: Airport, destination: Airport, start_time: datetime) -> list[FlightSegment] | None:
+    def findShortestPath(self, origin: Airport, destination: Airport, start_time: datetime) -> list[FlightSegment] | None:
         # Min-heap ordered by earliest arrival time
         queue: list[tuple[datetime, int, Airport, list[FlightSegment]]] = []
         heappush(queue, (start_time, next(counter), origin, []))
@@ -206,7 +216,6 @@ class AirportSystem:
         best: dict[Airport, datetime] = {origin: start_time}
 
         while queue:
-            print(len(queue));
             current_time, _, airport, path = heappop(queue)
 
             # Destination reached
@@ -215,9 +224,8 @@ class AirportSystem:
 
             # Explore outgoing flights
             for flight in airport.flights:
+                assert flight.origin == airport;
                 if not flight.destination:
-                    continue;
-                if flight.origin != airport:
                     continue;
 
                 # Must depart after we arrive
@@ -238,7 +246,6 @@ class AirportSystem:
 
 airportSystem : AirportSystem = AirportSystem();
 
-airportSystem.airports.append(Airport(name = "Fortaleza",       coordinate=Coordinate(-3.73, -38.52)));
 airportSystem.airports.append(Airport(name="Rio Branco",        coordinate=Coordinate(-9.97499, -67.8243)))
 airportSystem.airports.append(Airport(name="Maceió",            coordinate=Coordinate(-9.66599, -35.7350)))
 airportSystem.airports.append(Airport(name="Macapá",            coordinate=Coordinate(0.034934, -51.0694)))
@@ -270,14 +277,11 @@ airportSystem.airports.append(Airport(name="Palmas",            coordinate=Coord
 defaultPlaneModel : PlaneModel = PlaneModel();
 defaultPlaneModel.assentos = [False] * 64;
 
-#for i in range(1, 100):
-#    airportSystem.planes.append(Plane(defaultPlaneModel));
-
 for airport in airportSystem.airports:
     airport.planes.append(Plane(model=defaultPlaneModel, airport=airport))
 
 for airport in airportSystem.airports:
-    airportSystem.makeAirportRoutes(airport, 2);
+    airportSystem.makeAirportRoutes(airport, 3);
 
 for airport in airportSystem.airports:
     for plane in airport.planes:
@@ -286,11 +290,64 @@ for airport in airportSystem.airports:
 for a in airportSystem.airports:
     for b in airportSystem.airports:
         if a == b: continue;
-        print(f"A amount of routes: {len(a.routes)}.");
-        print(f"A amount of flightsegments: {len(a.flights)}.");
-
-        print(f"B amount of routes: {len(b.routes)}.");
-        print(f"B amount of flightsegments: {len(b.flights)}.");
-
         availableFlights = airportSystem.findShortestPath(a, b, systemTime + timedelta());
-        print(f"Voo possível entre {a.name} e {b.name}: ", availableFlights);
+        if not availableFlights:
+            print(f"Voo possível entre {a.name} e {b.name}: ");
+            continue;
+
+        print(f"Voo possível entre {a.name} e {b.name}: ", end="");
+        for flight in availableFlights:
+            if flight.destination:
+                print(f"{flight.origin.name} -> {flight.destination.name}, ", end="");
+        print("");
+
+
+import folium
+from folium.plugins import PolyLineTextPath
+
+m = folium.Map(location=[-14.2, -51.9], zoom_start=4)
+
+start = (-23.53, -46.63)  # São Paulo
+end   = (-22.91, -43.20)  # Rio
+
+line = folium.PolyLine(
+    [start, end],
+    weight=3
+).add_to(m)
+
+PolyLineTextPath(
+    line,
+    "▶",
+    repeat=True,
+    offset=7,
+    attributes={"font-size": "14px"}
+).add_to(m)
+
+m.save("map.html")
+
+m = folium.Map(location=[-14.2, -51.9], zoom_start=4)
+
+for a in airportSystem.airports:
+    folium.Marker(
+        [a.coordinate.latitude, a.coordinate.longitude],
+        popup=a.name
+    ).add_to(m)
+
+for a in airportSystem.airports:
+    for f in a.flights:
+        line = folium.PolyLine([
+            (a.coordinate.latitude, a.coordinate.longitude),
+            (f.destination.coordinate.latitude, f.destination.coordinate.longitude)
+        ]).add_to(m)
+
+        PolyLineTextPath(
+            line,
+            "➤",
+            repeat=False,
+            offset=6
+        ).add_to(m)
+
+
+m.save("map.html")
+
+
