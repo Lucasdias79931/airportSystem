@@ -1,120 +1,188 @@
 {% extends "dashboard.html" %}
 
 {% block head %}
-{{ super()}}
+{{ super() }}
+
 <script>
-    function toggleForm() {
-        const form = document.getElementById("flightForm");
-        form.style.display = (form.style.display === "block") ? "none" : "block";
-    }
+  function toggleForm() {
+    const form = document.getElementById("flightForm");
+    form.style.display = (form.style.display === "block") ? "none" : "block";
+  }
 </script>
 
 <style>
+  body {
+    background: url("{{ url_for('static', filename='images/background.jpg') }}")
+                no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+  }
+
+  .page-wrapper {
+    min-height: 100vh;
+    backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.55);
+    padding: 40px 0;
+  }
+
+  .card {
+    background-color: rgba(255, 255, 255, 0.96);
+    border-radius: 14px;
+    color: #212529;
+  }
+
+  .flight {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+  }
+
+  .flight strong {
+    font-size: 1.05rem;
+  }
+
+  .flight-buttons {
+    margin-top: 10px;
+    text-align: right;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-left: 5px;
+    color: white;
+  }
+
+  .btn-edit {
+    background-color: #f0ad4e;
+  }
+
+  .btn-delete {
+    background-color: #dc3545;
+  }
+
+  .btn-edit:hover {
+    background-color: #ec971f;
+  }
+
+  .btn-delete:hover {
+    background-color: #bb2d3b;
+  }
+
+  /* Floating Add Button */
   .add-flight-button {
-      position: fixed;
-    background-color: rgba(50, 150, 255, 1);
+    position: fixed;
+    bottom: 25px;
+    right: 30px;
+    background-color: #0d6efd;
     color: white;
     border: none;
-      bottom: 1px;
-      right: 30px;
-    padding: 10px 15px;
-    border-radius: 8px;
+    padding: 12px 18px;
+    border-radius: 50px;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.2s;
-    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
 
   .add-flight-button:hover {
-    background-color: rgba(30, 130, 230, 1);
+    background-color: #0b5ed7;
   }
 
+  /* Floating Form */
   .form-box {
-      position: fixed;
-      display: none;
-      bottom: 80px;
-      right: 30px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      color: black;
+    position: fixed;
+    display: none;
+    bottom: 90px;
+    right: 30px;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    color: black;
+    z-index: 1000;
   }
 
   .form-box input {
     width: 100%;
-    margin-bottom: 8px;
-  }
-
-  .btn-edit, .btn-delete {
-      text-decoration: none;
-      float: right;
-      padding: 4px 8px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.85rem;
-  }
-
-  .btn-edit {
-      background-color: rgba(200, 150, 50, 0.8);
-      color: white;
-  }
-
-  .btn-delete {
-      background-color: rgba(255, 50, 50, 0.8);
-      color: white;
+    margin-bottom: 10px;
   }
 </style>
 {% endblock %}
 
-
 {% block navdash %}
 <li class="nav-item">
-    <a class="nav-link" href="/settings">settings</a>
+  <a class="nav-link" href="/settings">Settings</a>
 </li>
 {% endblock %}
 
-
-{% block flights_container %}
-    {% for flight in flights.values() %}
-    <div class="flight">
-        <strong>{{ flight.source }}</strong> → <strong>{{ flight.destination }}</strong><br>
-        Horário de partida: {{ flight.entryTime }}<br>
-        Horário de chegada: {{ flight.exitTime }}<br>
-        Preço: ${{ flight.price }}
-        <div class="flight-buttons">
-            <a class="btn-edit" href="/dashboardADM/flight_edit?id={{ flight.id }}">Editar</a>
-            <a class="btn-delete" href="/dashboardADM/flight_delete?id={{ flight.id }}">Excluir</a>
-        </div>
-    </div>
-    {% endfor %}
-{% endblock %}
-
 {% block content %}
-<button class="add-flight-button" onclick="toggleForm()">+ Add Flight</button>
+<div class="page-wrapper">
+  <div class="container">
 
+    <div class="card shadow-lg">
+      <div class="card-body">
 
-<div id="flightForm" class="form-box">
-    <form method="POST" action="{{ url_for('dashboardADM.addFlight') }}">
-        <label>Source:</label>
-        <input type="text" name="source" required><br>
+        <h1 class="mb-4">Flights Management</h1>
 
-        <label>Destination:</label>
-        <input type="text" name="destination" required><br>
+        {% if not flights %}
+          <div class="alert alert-warning mb-0">
+            No flights registered.
+          </div>
+        {% else %}
+          {% for flight in flights.values() %}
+          <div class="flight">
+            <strong>{{ flight.source }}</strong>
+            →
+            <strong>{{ flight.destination }}</strong><br>
 
-        <label>Entry Time:</label>
-        <input type="time" name="entryTime" required><br>
+            Departure: {{ flight.entryTime }}<br>
+            Arrival: {{ flight.exitTime }}<br>
+            Price: <strong>${{ flight.price }}</strong>
 
-        <label>Exit Time:</label>
-        <input type="time" name="exitTime" required><br>
+            <div class="flight-buttons">
+              <a class="btn-edit" href="/dashboardADM/flight_edit?id={{ flight.id }}">Edit</a>
+              <a class="btn-delete" href="/dashboardADM/flight_delete?id={{ flight.id }}">Delete</a>
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
 
-        <label>Price:</label>
-        <input type="number" name="price" step="0.01" required><br>
+      </div>
+    </div>
 
-        <button type="submit">Add</button>
-    </form>
+  </div>
 </div>
 
-{{super()}}
+<button class="add-flight-button" onclick="toggleForm()">+ Add Flight</button>
+
+<div id="flightForm" class="form-box">
+  <form method="POST" action="{{ url_for('dashboardADM.addFlight') }}">
+    <label>Source</label>
+    <input type="text" name="source" required>
+
+    <label>Destination</label>
+    <input type="text" name="destination" required>
+
+    <label>Entry Time</label>
+    <input type="time" name="entryTime" required>
+
+    <label>Exit Time</label>
+    <input type="time" name="exitTime" required>
+
+    <label>Price</label>
+    <input type="number" name="price" step="0.01" required>
+
+    <button type="submit" class="btn btn-primary w-100">
+      Add Flight
+    </button>
+  </form>
+</div>
+
+{{ super() }}
 {% endblock %}
