@@ -12,8 +12,7 @@ def settings():
 
 
 @admin_required
-@settings_bp.route('/users', methods=['GET','POST'])
-@settings_bp.route('/users')
+@settings_bp.route('/users', methods=['GET'])
 def getUsers():
     order = request.args.get("order", "cpf")
 
