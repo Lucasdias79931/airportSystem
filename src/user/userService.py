@@ -34,7 +34,6 @@ class UserService:
 
         user.cpf = cpf_validated["cpf"]
 
-        print(type(user.cpf));
         if self.treeCPF.search(user.cpf):
             raise ValueError("CPF already exists")
 
@@ -64,11 +63,11 @@ class UserService:
 
     def getAllByName(self) -> list[User]:
         users = []
-        name_index = self.treeName.getAll()  # já vem ordenado por nome
+        name_index = self.treeName.getAll() 
 
         for cpf_list in name_index:
             for cpf in cpf_list:
-                users.append(self.treeCPF.search(cpf))
+                users.append(self.treeName.search(cpf))
 
         return users
 

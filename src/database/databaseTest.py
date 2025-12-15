@@ -34,7 +34,7 @@ def main():
     );
 
 
-    print(userServ.userRepository.tree.search(int(user.cpf)))
+    print(userServ.userRepository.tree.search(user.cpf))
     return;
 
     for i in range(1, 10):
