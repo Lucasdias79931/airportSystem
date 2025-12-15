@@ -34,7 +34,6 @@ def login():
         print(f"[ERRO LOGIN] {e}")  
         return redirect(url_for("auth.login"))
 
-
 @auth_bp.route("/logout")
 def logout():
     session.pop("usuario", None)

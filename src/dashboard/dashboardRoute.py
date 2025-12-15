@@ -7,52 +7,9 @@ from src.user.authRoute import userService
 from src.user.user import User
 from datetime import datetime
 from src.models.plane import airportSystem;
+import src.models.flights as flightModule;
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
-
-@login_required
-@dashboard_bp.route('/i', methods=['GET','POST'])
-def dashboardi():
-    cpf = session.get('usuario');
-
-    user : User | None = userService.findByCpf(cpf);
-    if(user == None):
-        return render_template("dashboard.html", flights = flights.flights, bookedFlights = None);
-
-    flights.loadFlights();
-    print("Viagens compradas pelo usuário: ", user.flightsBookedIDS);
-    if request.method == "GET":
-        return render_template("dashboard.html", flights = flights.flights, bookedFlights = user.flightsBookedIDS);
-
-
-@login_required
-@dashboard_bp.route('/book_flight', methods=['GET','POST'])
-def bookFlight():
-    cpf = session.get('usuario');
-    flightId = int(request.args.get("id"));
-
-    flights.loadFlights();
-    flight = flights.flights[flightId];
-    if flight == None:
-        return redirect(url_for("dashboard.dashboard"));
-
-    temp = userService.findByCpf(cpf)
-    if( temp == None):
-        return redirect(url_for("dashboard.dashboard"));
-
-    user : User = temp; 
-    if(user.flightsBookedIDS == None):
-        user.flightsBookedIDS = {}
-
-    if(flightId in user.flightsBookedIDS):
-        return redirect(url_for("dashboard.dashboard"));
-
-
-    user.flightsBookedIDS[flightId] = flightId;
-    userService.saveUser(user);
-
-    return redirect(url_for("dashboard.dashboard"));
-
 
 @dashboard_bp.route("/", methods=['GET', 'POST'])
 def dashboard():
@@ -82,9 +39,34 @@ def dashboard():
             error = "Invalid search parameters."
 
     return render_template(
-        "dashboard_cool.html",
+        "dashboard.html",
         airports=airports,
         path=path,
         error=error
     )
 
+
+@dashboard_bp.route("/book", methods=["POST"])
+def book_flight():
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    cpf = session["usuario"]
+    user = userService.findByCpf(cpf);
+
+    # data coming from hidden form fields
+    path_ids = request.form.getlist("path_ids")
+    price = float(request.form["price"])
+    departure = datetime.fromisoformat(request.form["departure"])
+    arrival = datetime.fromisoformat(request.form["arrival"])
+
+    flight = flightModule.Flight(
+        path=[int(i) for i in path_ids],
+        price=price,
+        departure=departure,
+        arrival=arrival
+    )
+
+    booking = flightModule.addFlight(userCpf=user.cpf, flight=flight)
+
+    return redirect(url_for("dashboard.confirmation"))

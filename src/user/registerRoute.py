@@ -1,3 +1,4 @@
+import traceback
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from .userService import userService
 from .user import User
@@ -37,6 +38,7 @@ def register():
         flash(str(e), "danger");
         return render_template("register.html");
     except Exception as e:
+        traceback.print_exc()
         print("Erro inesperado:", e);
         flash("Internal server error", "danger");
         return render_template("register.html");

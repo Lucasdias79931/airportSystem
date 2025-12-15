@@ -1,100 +1,263 @@
 {% extends "homeBase.html" %}
 
-{% block title %}Página Inicial - FlaskApp{% endblock %}
+{% block title %}Flight Search{% endblock %}
 
 {% block head %}
-{{ super() }}
 <style>
-  .flights-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
+.flight-card {
+  max-width: 900px;
+  margin: 30px auto;
+  background: white;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.flight-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flight-header .route {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.flight-header .arrow {
+  margin: 0 8px;
+  color: #6b7280;
+}
+
+.flight-header .price {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0066ff;
+}
+
+.flight-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+  color: #374151;
+}
+
+.segments {
+  margin-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.segment {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 14px;
+  color: #374151;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.segment:last-child {
+  border-bottom: none;
+}
+
+  .flight-search * {
+    box-sizing: border-box;
   }
 
-  .flight {
-      background: linear-gradient(135deg, rgba(0.4, 0.36, 0.36, 0.5), rgba(0.4, 0.36, 1.0, 0.5));
-      border-radius: 10px;
-      padding: 15px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-      color: white;
+  .flight-search {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f4f6f8;
+    padding: 40px;
   }
 
-  .btn-book{
-      text-decoration: none;
-      float: right;
-      padding: 4px 8px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      background-color: rgba(40, 220, 100, 0.85);
-      color: white;
+  .flight-search .search-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    max-width: 900px;
+    margin: auto;
   }
 
-  .btn-booked{
-      text-decoration: none;
-      float: right;
-      padding: 4px 8px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      background-color: rgba(256, 150, 150, 0.85);
-      color: white;
+  .flight-search .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
   }
 
+  .flight-search .field label {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  .flight-search .field input {
+    border: none;
+    outline: none;
+    font-size: 15px;
+    padding: 8px 10px;
+    background: #f9fafb;
+    border-radius: 8px;
+  }
+
+  .flight-search .search-btn {
+    background: #0066ff;
+    color: white;
+    border: none;
+    padding: 14px 22px;
+    font-size: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+
+  .flight-search .search-btn:hover {
+    background: #0052cc;
+  }
+
+  .flight-search .results {
+    max-width: 900px;
+    margin: 30px auto 0;
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+
+  .flight-search .results ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .flight-search .results li {
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .flight-search .results li:last-child {
+    border-bottom: none;
+  }
+
+  .flight-search .error {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 10px;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="flights-container">
-    {% if flights %}
-    {% block flights_container %}
-        {% for flight in flights.values() %}
-        <div class="flight">
-            <strong>{{ flight.source }}</strong> → <strong>{{ flight.destination }}</strong><br>
-            Horário de partida: {{ flight.entryTime }}<br>
-            Horário de chegada: {{ flight.exitTime }}<br>
-            Preço: ${{ flight.price }}
+<div class="flight-search">
 
-            {% if session.get('usuario') %}
-                {% if bookedFlights and flight.id in bookedFlights %}
-                    <div class="flight-buttons">
-                        <a class="btn-booked">Comprado</a>
-                    </div>
-                {% else %}
-                    <div class="flight-buttons">
-                        <a class="btn-book" href="/dashboard/book_flight?id={{ flight.id }}">Comprar</a>
-                    </div>
-                {% endif %}
-            {% endif %}
-        </div>
-        {% endfor %}
-    {% endblock %}
-    {% else %}
-         <p style="color: gray; font-size: 1.2rem; text-align: center;">
-            No flights available.
-        </p>
-    {% endif %}
-</div>
-{% endblock %}
+  <form class="search-bar" method="post">
 
-{% block nav %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{{ url_for('home.index') }}">FlaskApp</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        {% block navdash %}{% endblock %}
-          <li class="nav-item"><a class="nav-link" href="/auth/logout">Logout</a></li>
-
-      </ul>
+    <div class="field">
+      <label>Origem</label>
+      <input
+        type="text"
+        name="origin"
+        list="airport-list"
+        value="{{ request.form.origin or '' }}"
+        required
+      >
     </div>
-  </div>
-</nav>
-{% endblock %}
 
+    <div class="field">
+      <label>Destino</label>
+      <input
+        type="text"
+        name="destination"
+        list="airport-list"
+        value="{{ request.form.destination or '' }}"
+        required
+      >
+    </div>
+
+    <div class="field">
+      <label>Decolagem</label>
+      <input
+        type="datetime-local"
+        name="departure"
+        value="{{ request.form.departure or '' }}"
+        required
+      >
+    </div>
+
+    <button class="search-btn" type="submit">Procurar</button>
+
+  </form>
+
+  {% if error %}
+    <div class="error">{{ error }}</div>
+  {% endif %}
+
+
+  {% if path and path.path%}
+    <div class="flight-card">
+
+      <div class="flight-header">
+        <div class="route">
+          <span class="city">{{ path.path[0].origin.name }}</span>
+          <span class="arrow">→</span>
+          <span class="city">{{ path.path[-1].destination.name }}</span>
+        </div>
+
+        <div class="price">
+          R$ {{ "%.2f"|format(path.price) }}
+        </div>
+      </div>
+
+      <div class="path-meta">
+        <div>
+          <strong>Decolagem</strong><br>
+          {{ path.departure.strftime("%d %b %H:%M") }}
+        </div>
+
+        <div>
+          <strong>Aterrissagem</strong><br>
+          {{ path.arrival.strftime("%d %b %H:%M") }}
+        </div>
+
+        <div>
+          <strong>Duração</strong><br>
+          {{ (path.arrival - path.departure) }}
+        </div>
+
+        <div>
+          <strong>Paradas</strong><br>
+          {{ path.path|length - 1 }}
+        </div>
+      </div>
+
+      <div class="segments">
+        {% for s in path.path %}
+          <div class="segment">
+            <span class="seg-route">
+              {{ s.origin.name }} → {{ s.destination.name }}
+            </span>
+            <span class="seg-time">
+              {{ s.departure.strftime("%H:%M") }} – {{ s.arrival.strftime("%H:%M") }}
+            </span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% if airports %}
+<datalist id="airport-list">
+  {% for a in airports %}
+    <option value="{{ a }}">
+  {% endfor %}
+</datalist>
+{% endif %}
+{% endblock %}
 

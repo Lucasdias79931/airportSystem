@@ -18,7 +18,7 @@ class UserService:
 
     def cpfExists(self, cpf:str) -> bool:
         #cpf_numbers = re.sub(r"\D", "", cpf)
-        cpf_numbers = int(cpf)
+        cpf_numbers = cpf
 
         if self.tree.search(cpf_numbers) == None:
             return False
@@ -34,25 +34,26 @@ class UserService:
 
         user.cpf = cpf_validated["cpf"]
 
-        if self.treeCPF.search(int(user.cpf)):
+        print(type(user.cpf));
+        if self.treeCPF.search(user.cpf):
             raise ValueError("CPF already exists")
 
         user.password = bcrypt.hashpw(
             user.password.encode(), bcrypt.gensalt()
         ).decode()
 
-        self.treeCPF.insert(int(user.cpf), user)
+        self.treeCPF.insert(user.cpf, user)
 
         name_key = self.normalize_name(user.name)
 
         cpfs = self.treeName.search(name_key)
         if cpfs is None:
-            self.treeName.insert(name_key, [int(user.cpf)])
+            self.treeName.insert(name_key, [user.cpf])
         else:
-            cpfs.append(int(user.cpf))
+            cpfs.append(user.cpf)
             self.treeName.update(name_key, cpfs)
     
-    def findByName(self, name: str) -> list[User]:
+    def findByName(self, name: str):
         name_key = self.normalize_name(name)
 
         cpfs = self.treeName.search(name_key)
@@ -71,8 +72,6 @@ class UserService:
 
         return users
 
-
-
     def login(self, data : Dict):
         try:
             cpf = data.get("cpf")
@@ -81,7 +80,7 @@ class UserService:
             if not cpf or not password:
                 raise ValueError("CPF ou senha não preenchidos!")
 
-            user : User | None = self.treeCPF.search(int(cpf))
+            user : User | None = self.treeCPF.search(cpf)
             if not user:
                 raise ValueError('Usuário não existe');
             
@@ -104,10 +103,10 @@ class UserService:
 
 
     def findByCpf(self, cpf : str) -> User | None:
-        return self.treeCPF.search(int(cpf));
+        return self.treeCPF.search(cpf);
 
     def saveUser(self, user: User):
-        self.treeCPF.update(int(user.cpf), user);
+        self.treeCPF.update(user.cpf, user);
         self.treeName.update(user.name, user);
 
 

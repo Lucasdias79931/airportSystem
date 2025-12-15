@@ -1,32 +1,30 @@
 import pickle
+from dataclasses import dataclass
+from src.models.otherModels import FlightSegment
+from datetime import datetime
 
+@dataclass 
 class Flight:
-    #inteiros
-    id : int
-    price : int
+    path : list[int];
 
-    #Strings 
-    source : str
-    destination : str
+    price : float;
 
-    #datas/tempo
-    entryTime = None
-    exitTime = None
+    departure: datetime;
+    arrival: datetime;
 
-    def __init__(self, id, price, source, destination, entryTime, exitTime):
-        self.id = id
-        self.price = price
-        self.source = source
-        self.destination = destination
-        self.entryTime = entryTime
-        self.exitTime = exitTime
-        return 
+    id : int = 0;
+    userId : str = "";
 
 #local onde irá ser colocado todos os voos
 #chave vai ser o id do voo e o conteúdo vai ser a struct do voo em si
-flights = {} 
+flights : dict[int, Flight] = {} 
 
-lastId = 1
+lastId : int = 1
+def addFlight(flight : Flight, userCpf : str):
+    global lastId;
+    flight.id = lastId + 1;
+    flight.userId = userCpf;
+    lastId += 1;
 
 def saveFlights():
     with open("flights.bin", "wb") as f:   # "wb" = write binary

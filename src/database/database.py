@@ -6,7 +6,7 @@ class DiskBTreeNode:
         self.node_id = node_id
         self.t = t
         self.leaf = leaf
-        self.keys = []
+        self.keys : list[str]= []
         self.values = []
         self.children = []   
 
@@ -80,13 +80,14 @@ class DiskBTree:
         self.next_id = meta["next_id"]
         self.t = meta["t"]
 
-    def search(self, cpf : int, node_id=None):
+    def search(self, cpf : str, node_id=None):
         if node_id is None:
             node_id = self.root_id
 
         node = self._load_node(node_id)
 
         i = 0
+        print("tipo: ", type(node.keys[i]));
         while i < len(node.keys) and cpf > node.keys[i]:
             i += 1
 
@@ -98,7 +99,7 @@ class DiskBTree:
 
         return self.search(cpf, node.children[i])
 
-    def insert(self, key : int, value):
+    def insert(self, key : str, value):
         root = self._load_node(self.root_id)
         if len(root.keys) == 2 * self.t - 1:
             new_root = self._create_node(leaf=False)
@@ -112,8 +113,10 @@ class DiskBTree:
             self._insert_non_full(root, key, value)
             self._save_node(root)
 
-    def _insert_non_full(self, node, key : int, value):
+    def _insert_non_full(self, node, key : str, value):
         i = len(node.keys) - 1
+
+        assert type(key) == "str";
 
         if node.leaf:
             node.keys.append(None)
@@ -167,11 +170,11 @@ class DiskBTree:
         self._save_node(new)
         self._save_node(parent)
 
-    def update(self, key: int, new_value) -> bool:
+    def update(self, key : str, new_value) -> bool:
         return self._update_recursive(key, new_value, self.root_id);
 
 
-    def _update_recursive(self, key: int, new_value, node_id: int) -> bool:
+    def _update_recursive(self, key : str, new_value, node_id: int) -> bool:
         node = self._load_node(node_id)
 
         # 1. Find the first key >= target key

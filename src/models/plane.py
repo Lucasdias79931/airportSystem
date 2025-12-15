@@ -1,6 +1,8 @@
 import math
 import random
 
+from src.models.otherModels import distance, PlaneModel, Plane, FlightSegment, Airport, Coordinate
+import src.models.flights as flightModule 
 from itertools import count
 from typing import List, Tuple
 from heapq import heappush, heappop
@@ -15,6 +17,7 @@ from dataclasses import dataclass, field
 systemTime : datetime = datetime.now();
 counter = count()
 
+lastid : int = 0;
 
 cityNames: list[str] = [
     "Rio Branco",
@@ -45,85 +48,66 @@ cityNames: list[str] = [
     "Aracaju",
     "Palmas",
 ]
-
-@dataclass
-class PlaneModel:
-    amountOfSeats : int = 60;
-    speedkmh : float = 800;
-    costKm : float = 0.05;
-
-@dataclass
-class Plane:
-    model : PlaneModel;
-    airport : "Airport | None" = None;
-    flights : list["FlightSegment"] = field(default_factory=list);
-
-#Valores negativos para o sul e positivos para o norte
-#Valores negativos para o oeste e positivos para o leste
-@dataclass
-class Coordinate:
-    latitude : float = 0;
-    longitude : float = 0;
-
-#Cidade
-@dataclass(eq=False)
-class Airport:
-    name : str = "Cidade";
-    routes : list["Airport"] = field(default_factory=list);
-    flights : list["FlightSegment"] = field(default_factory=list);
-    planes : list[Plane] = field(default_factory=list);
-    coordinate : Coordinate = field(default_factory=Coordinate);
-
-    def __hash__(self):
-        return id(self)
-
-    def __repr__(self):
-        return f"Airport({self.name})"
-
-@dataclass
-class FlightSegment:
-    origin : Airport;
-    destination: Airport;
-    plane: Plane;
-    price : float;
-    departure: datetime = datetime(year=1000, month=1, day=1, hour=0);
-    arrival: datetime = datetime(year=1000, month=1, day=1, hour=0);
-    seatsTaken : int = 0;
-
-    def __repr__(self):
-        return f"{self.plane.airport.name} -> {self.destination.name} ({self.departure:%H:%M})" if self.plane  and self.plane.airport and self.destination else "";
-
-@dataclass 
-class Flight:
-    path : list[FlightSegment];
-
-    price : float;
-
-    departure: datetime;
-    arrival: datetime;
-
-
-def distance(a: Coordinate, b: Coordinate) -> float:
-    R = 6371.0
-
-    lat1 = math.radians(a.latitude)
-    lon1 = math.radians(a.longitude)
-    lat2 = math.radians(b.latitude)
-    lon2 = math.radians(b.longitude)
-
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    h = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
-    c = 2 * math.atan2(math.sqrt(h), math.sqrt(1 - h))
-
-    return R * c
-
-
 @dataclass
 class AirportSystem:
     airports : list[Airport] = field(default_factory=list);
     planes : list[Plane] = field(default_factory=list);
+
+    def makeAirport(self):
+        defaultPlaneModel : PlaneModel = PlaneModel();
+        self.airports.append(Airport(name="Rio Branco",        coordinate=Coordinate(-9.97499, -67.8243)))
+        self.airports.append(Airport(name="Maceió",            coordinate=Coordinate(-9.66599, -35.7350)))
+        self.airports.append(Airport(name="Macapá",            coordinate=Coordinate(0.034934, -51.0694)))
+        self.airports.append(Airport(name="Manaus",            coordinate=Coordinate(-3.39289, -57.7067)))
+        self.airports.append(Airport(name="Salvador",          coordinate=Coordinate(-12.9718, -38.5011)))
+        self.airports.append(Airport(name="Fortaleza",         coordinate=Coordinate(-3.71664, -38.5423)))
+        self.airports.append(Airport(name="Brasília",          coordinate=Coordinate(-15.7795, -47.9297)))
+        self.airports.append(Airport(name="Vitória",           coordinate=Coordinate(-20.3155, -40.3128)))
+        self.airports.append(Airport(name="Goiânia",           coordinate=Coordinate(-16.6864, -49.2643)))
+        self.airports.append(Airport(name="São Luís",          coordinate=Coordinate(-2.53874, -44.2825)))
+        self.airports.append(Airport(name="Cuiabá",            coordinate=Coordinate(-15.6010, -56.0974)))
+        self.airports.append(Airport(name="Campo Grande",      coordinate=Coordinate(-20.4486, -54.6295)))
+        self.airports.append(Airport(name="Belo Horizonte",    coordinate=Coordinate(-19.9102, -43.9266)))
+        self.airports.append(Airport(name="Belém",             coordinate=Coordinate(-1.4554, -48.4898)))
+        self.airports.append(Airport(name="João Pessoa",       coordinate=Coordinate(-7.11509, -34.8641)))
+        self.airports.append(Airport(name="Curitiba",          coordinate=Coordinate(-25.4195, -49.2646)))
+        self.airports.append(Airport(name="Recife",            coordinate=Coordinate(-8.04666, -34.8771)))
+        self.airports.append(Airport(name="Teresina",          coordinate=Coordinate(-5.09194, -42.8034)))
+        self.airports.append(Airport(name="Rio de Janeiro",    coordinate=Coordinate(-22.9129, -43.2003)))
+        self.airports.append(Airport(name="Natal",             coordinate=Coordinate(-5.79357, -35.1986)))
+        self.airports.append(Airport(name="Porto Alegre",      coordinate=Coordinate(-30.0318, -51.2065)))
+        self.airports.append(Airport(name="Porto Velho",       coordinate=Coordinate(-8.76077, -63.8999)))
+        self.airports.append(Airport(name="Boa Vista",         coordinate=Coordinate(2.82384, -60.6753)))
+        self.airports.append(Airport(name="Florianópolis",     coordinate=Coordinate(-27.5945, -48.5477)))
+        self.airports.append(Airport(name="São Paulo",         coordinate=Coordinate(-23.5329, -46.6395)))
+        self.airports.append(Airport(name="Aracaju",           coordinate=Coordinate(-10.9091, -37.0677)))
+        self.airports.append(Airport(name="Palmas",            coordinate=Coordinate(-10.24,   -48.3558)))
+
+        defaultPlaneModel : PlaneModel = PlaneModel();
+
+        for airport in self.airports:
+            airport.planes.append(Plane(model=defaultPlaneModel, airport=airport))
+
+        for airport in self.airports:
+            self.makeAirportRoutes(airport, 3);
+
+        for airport in self.airports:
+            for plane in airport.planes:
+                self.makePlaneRoutes(plane, 1, systemTime);
+
+        for a in self.airports:
+            for b in self.airports:
+                if a == b: continue;
+                availableFlights = self.findShortestPath(a, b, systemTime + timedelta());
+                if not availableFlights:
+                    print(f"Voo possível entre {a.name} e {b.name}: ");
+                    continue;
+
+                print(f"Voo possível entre {a.name} e {b.name}: ", end="");
+                for flight in availableFlights:
+                    if flight.destination:
+                        print(f"{flight.origin.name} -> {flight.destination.name}, ", end="");
+                print("");
 
     def addPlane(self, airport : Airport, plane : Plane):
         self.planes.append(plane);
@@ -185,8 +169,10 @@ class AirportSystem:
             if arrival > limitTime:
                 break;
 
+            global lastid
             price : float = dist * plane.model.costKm;
             flight = FlightSegment(
+                id=lastid + 1,
                 origin=currentAirport,
                 destination=nextAirport,
                 plane=plane,
@@ -194,6 +180,8 @@ class AirportSystem:
                 arrival=arrival,
                 price = price
             );
+
+            lastid+=1;
 
             currentAirport.flights.append(flight);
             plane.flights.append(flight);
@@ -251,77 +239,42 @@ class AirportSystem:
         return None
 
     def getShortestFlight(self, origin: Airport, destination: Airport, start_time: datetime):
-        flights : list[FlightSegment] | None = self.findShortestPath(origin, destination, start_time);
-        if flights == None: 
+        path : list[FlightSegment] | None = self.findShortestPath(origin, destination, start_time);
+        if path == None: 
             return None;
         price: float = 0;
-        departure: datetime = flights[0].departure;
-        arrival: datetime = flights[0].arrival;
-        for f in flights:
-            price += f.price;
-            arrival += f.arrival - arrival;
-            arrival += f.arrival - f.departure;
-        flight : Flight = Flight(path = flights, price=price, departure=departure, arrival=arrival);
+        departure: datetime = path[0].departure;
+        arrival: datetime = path[0].arrival;
+        for fli in path:
+            price += fli.price;
+            arrival += fli.arrival - arrival;
+            arrival += fli.arrival - fli.departure;
+        pathIds : list[int] = [];
+        for fSeg in path:
+            pathIds.append(fSeg.id);
+        f : flightModule.Flight = flightModule.Flight(path=pathIds, departure=departure, arrival=arrival, price=price);
 
-        return flight;
+        return f;
 
+import pickle
 
+airportFile : str = "./airport";
 airportSystem : AirportSystem = AirportSystem();
 
-defaultPlaneModel : PlaneModel = PlaneModel();
-airportSystem.airports.append(Airport(name="Rio Branco",        coordinate=Coordinate(-9.97499, -67.8243)))
-airportSystem.airports.append(Airport(name="Maceió",            coordinate=Coordinate(-9.66599, -35.7350)))
-airportSystem.airports.append(Airport(name="Macapá",            coordinate=Coordinate(0.034934, -51.0694)))
-airportSystem.airports.append(Airport(name="Manaus",            coordinate=Coordinate(-3.39289, -57.7067)))
-airportSystem.airports.append(Airport(name="Salvador",          coordinate=Coordinate(-12.9718, -38.5011)))
-airportSystem.airports.append(Airport(name="Fortaleza",         coordinate=Coordinate(-3.71664, -38.5423)))
-airportSystem.airports.append(Airport(name="Brasília",          coordinate=Coordinate(-15.7795, -47.9297)))
-airportSystem.airports.append(Airport(name="Vitória",           coordinate=Coordinate(-20.3155, -40.3128)))
-airportSystem.airports.append(Airport(name="Goiânia",           coordinate=Coordinate(-16.6864, -49.2643)))
-airportSystem.airports.append(Airport(name="São Luís",          coordinate=Coordinate(-2.53874, -44.2825)))
-airportSystem.airports.append(Airport(name="Cuiabá",            coordinate=Coordinate(-15.6010, -56.0974)))
-airportSystem.airports.append(Airport(name="Campo Grande",      coordinate=Coordinate(-20.4486, -54.6295)))
-airportSystem.airports.append(Airport(name="Belo Horizonte",    coordinate=Coordinate(-19.9102, -43.9266)))
-airportSystem.airports.append(Airport(name="Belém",             coordinate=Coordinate(-1.4554, -48.4898)))
-airportSystem.airports.append(Airport(name="João Pessoa",       coordinate=Coordinate(-7.11509, -34.8641)))
-airportSystem.airports.append(Airport(name="Curitiba",          coordinate=Coordinate(-25.4195, -49.2646)))
-airportSystem.airports.append(Airport(name="Recife",            coordinate=Coordinate(-8.04666, -34.8771)))
-airportSystem.airports.append(Airport(name="Teresina",          coordinate=Coordinate(-5.09194, -42.8034)))
-airportSystem.airports.append(Airport(name="Rio de Janeiro",    coordinate=Coordinate(-22.9129, -43.2003)))
-airportSystem.airports.append(Airport(name="Natal",             coordinate=Coordinate(-5.79357, -35.1986)))
-airportSystem.airports.append(Airport(name="Porto Alegre",      coordinate=Coordinate(-30.0318, -51.2065)))
-airportSystem.airports.append(Airport(name="Porto Velho",       coordinate=Coordinate(-8.76077, -63.8999)))
-airportSystem.airports.append(Airport(name="Boa Vista",         coordinate=Coordinate(2.82384, -60.6753)))
-airportSystem.airports.append(Airport(name="Florianópolis",     coordinate=Coordinate(-27.5945, -48.5477)))
-airportSystem.airports.append(Airport(name="São Paulo",         coordinate=Coordinate(-23.5329, -46.6395)))
-airportSystem.airports.append(Airport(name="Aracaju",           coordinate=Coordinate(-10.9091, -37.0677)))
-airportSystem.airports.append(Airport(name="Palmas",            coordinate=Coordinate(-10.24,   -48.3558)))
+def saveAirportSystem() -> None:
+    global airportSystem, airportFile
+    with open(airportFile, "wb") as f:
+        pickle.dump(airportSystem, f)
 
-defaultPlaneModel : PlaneModel = PlaneModel();
+def loadAirportSystem():
+    global airportSystem, airportFile
+    with open(airportFile, "rb") as f:
+        airportSystem = pickle.load(f)
 
-for airport in airportSystem.airports:
-    airport.planes.append(Plane(model=defaultPlaneModel, airport=airport))
-
-for airport in airportSystem.airports:
-    airportSystem.makeAirportRoutes(airport, 3);
-
-for airport in airportSystem.airports:
-    for plane in airport.planes:
-        airportSystem.makePlaneRoutes(plane, 1, systemTime);
-
-for a in airportSystem.airports:
-    for b in airportSystem.airports:
-        if a == b: continue;
-        availableFlights = airportSystem.findShortestPath(a, b, systemTime + timedelta());
-        if not availableFlights:
-            print(f"Voo possível entre {a.name} e {b.name}: ");
-            continue;
-
-        print(f"Voo possível entre {a.name} e {b.name}: ", end="");
-        for flight in availableFlights:
-            if flight.destination:
-                print(f"{flight.origin.name} -> {flight.destination.name}, ", end="");
-        print("");
+if len(airportSystem.airports) != 0:
+    saveAirportSystem();
+else:
+    loadAirportSystem();
 
 
 import folium
@@ -372,7 +325,5 @@ for a in airportSystem.airports:
             offset=6
         ).add_to(m)
 
-
 m.save("map.html")
-
 
