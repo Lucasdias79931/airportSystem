@@ -9,6 +9,7 @@ from src.user.user import User
 from datetime import datetime, date
 from src.models.plane import airportSystem;
 import src.models.flights as flightModule;
+from Utils.Utils import Privilege;
 from src.models.otherModels import FlightSegment;
 
 
@@ -19,9 +20,9 @@ def dashboard():
     airports = [a.name for a in airportSystem.airports]
     path = None
     bought = False;
-    userLogged = False;
+    user = None;
     if "usuario" in session:
-        userLogged = userService.findByCpf(session["usuario"]) != None;
+        user = userService.findByCpf(session["usuario"]);
     legs : list[FlightSegment] = []
     error = None
         
@@ -51,15 +52,13 @@ def dashboard():
                         if not newLeg:
                             continue;
                         legs.append(newLeg);
-                    if userLogged:
-                        user = userService.findByCpf(session["usuario"]);
 
-                        if user and user.flightsBookedIDS:
-                            bought = False 
-                            for f in user.flightsBookedIDS:
-                                if f.path == path.path:
-                                    bought = True;
-                                    break;
+                    if user and user.flightsBookedIDS:
+                        bought = False 
+                        for f in user.flightsBookedIDS:
+                            if f.path == path.path:
+                                bought = True;
+                                break;
 
 
         except Exception as e:
@@ -73,7 +72,8 @@ def dashboard():
         error=error,
         legs=legs,
         bought=bought,
-        userLogged=userLogged
+        user=user,
+        Privilege=Privilege
     )
 
 

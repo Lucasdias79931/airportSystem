@@ -3,6 +3,7 @@ from Utils.Utils import admin_required
 from src.user.userService import userService;
 
 import src.models.flights as flights;
+from Utils.Utils import Privilege;
 
 
 dashboardADM_bp = Blueprint("dashboardADM", __name__, url_prefix="/dashboardADM")
@@ -13,7 +14,8 @@ def dashboardADM():
     flights.loadFlights()
     return render_template(
         "dashboardADM.html",
-        flights=flights.flights
+        flights=flights.flights,
+        Privilege=Privilege
     )
 
 @admin_required

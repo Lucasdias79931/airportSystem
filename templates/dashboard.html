@@ -197,7 +197,6 @@ body {
 
 {% endblock %}
 
-{%if not userLogged%}
 {% block nav %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark w-100">
   <div class="container-fluid">
@@ -208,8 +207,10 @@ body {
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         {% block navdash %}{% endblock %}
-        <a class="nav-link" href="{{ url_for('settings.settings') }}">Settings</a>
-        {% if not session.get('usuario') %}
+        {%if user and user.privilege == Privilege.Adm %}
+            <a class="nav-link" href="{{ url_for('settings.settings') }}">Settings</a>
+        {% endif %}
+        {% if not user %}
           <li class="nav-item"><a class="nav-link" href="/auth/login">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="/user/register">Registrar</a></li>
         {% else %}
@@ -221,7 +222,6 @@ body {
   </div>
 </nav>
 {% endblock %}
-{% endif %}
 
 {% block content %}
 <div class="flight-search">
@@ -318,7 +318,7 @@ body {
           </div>
         {% endfor %}
       </div>
-      {%if userLogged%}
+      {%if user%}
       {% if not bought %}
         <form method="post" action="{{ url_for('dashboard.book_flight') }}">
           {# list of segment / path ids #}
