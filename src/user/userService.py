@@ -66,10 +66,14 @@ class UserService:
         name_index = self.treeName.getAll() 
 
         for cpf_list in name_index:
+            print(cpf_list);
             for cpf in cpf_list:
-                users.append(self.treeName.search(cpf))
+                users.append(self.treeCPF.search(cpf))
 
         return users
+
+    def getAllByCpf(self) -> list[User]:
+        return self.treeCPF.getAll()
 
     def login(self, data : Dict):
         try:

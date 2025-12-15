@@ -87,7 +87,6 @@ class DiskBTree:
         node = self._load_node(node_id)
 
         i = 0
-        print("tipo: ", type(node.keys[i]));
         while i < len(node.keys) and cpf > node.keys[i]:
             i += 1
 
@@ -116,7 +115,7 @@ class DiskBTree:
     def _insert_non_full(self, node, key : str, value):
         i = len(node.keys) - 1
 
-        assert type(key) == "str";
+        #assert type(key) == "str";
 
         if node.leaf:
             node.keys.append(None)
@@ -217,4 +216,23 @@ class DiskBTree:
                 out_list.append(node.values[i])
             # final child
             self._collect(node.children[-1], out_list)
+
+    def getByName(self, name: str) -> list:
+        result = []
+        self._collect_by_name(self.root_id, name, result)
+        return result
+
+    def _collect_by_name(self, node_id: int, name: str, out_list: list):
+        node = self._load_node(node_id)
+
+        if node.leaf:
+            for v in node.values:
+                if v.name == name:
+                    out_list.append(v)
+        else:
+            for i in range(len(node.keys)):
+                self._collect_by_name(node.children[i], name, out_list)
+                if node.values[i].name == name:
+                    out_list.append(node.values[i])
+            self._collect_by_name(node.children[-1], name, out_list)
 

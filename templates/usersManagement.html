@@ -132,12 +132,16 @@
                   <td class="mono">{{ u.flightsBookedIDS }}</td>
                   <td>
                     <span class="badge bg-secondary">
-                      {{ u.status.name }}
+                        {%if u.status%}
+                          {{ u.status.name }}
+                        {%endif%}
                     </span>
                   </td>
                   <td>
                     <span class="badge bg-primary">
-                      {{ u.privilege.name }}
+                        {%if u.privilege%}
+                          {{ u.privilege.name }}
+                        {%endif%}
                     </span>
                   </td>
                 </tr>

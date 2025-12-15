@@ -16,12 +16,11 @@ def settings():
 def getUsers():
     order = request.args.get("order", "cpf")
 
+    print(order);
     if order == "name":
         users = userService.getAllByName()
     else:
         users = userService.treeCPF.getAll()
-
-
 
     return render_template("usersManagement.html", users=users, order=order)
 

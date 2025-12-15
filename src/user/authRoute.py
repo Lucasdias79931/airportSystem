@@ -32,6 +32,7 @@ def login():
         flash("Ocorreu um erro interno. Tente novamente mais tarde.", "danger")
         
         print(f"[ERRO LOGIN] {e}")  
+        traceback.print_exc()
         return redirect(url_for("auth.login"))
 
 @auth_bp.route("/logout")
