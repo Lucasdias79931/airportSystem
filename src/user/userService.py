@@ -65,8 +65,9 @@ class UserService:
         users = []
         name_index = self.treeName.getAll() 
 
+        
         for cpf_list in name_index:
-            print(cpf_list);
+            
             for cpf in cpf_list:
                 users.append(self.treeCPF.search(cpf))
 
@@ -109,8 +110,18 @@ class UserService:
         return self.treeCPF.search(cpf);
 
     def saveUser(self, user: User):
-        self.treeCPF.update(user.cpf, user);
-        self.treeName.update(user.name, user);
+        self.treeCPF.update(user.cpf, user)
+
+        name_key = self.normalize_name(user.name)
+
+        cpfs = self.treeName.search(name_key)
+        if cpfs is None:
+            self.treeName.insert(name_key, [user.cpf])
+        else:
+            if user.cpf not in cpfs:
+                cpfs.append(user.cpf)
+            self.treeName.update(name_key, cpfs)
+
 
 
 userService = UserService()
