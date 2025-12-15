@@ -8,12 +8,13 @@ import src.models.flights as flights;
 dashboardADM_bp = Blueprint("dashboardADM", __name__, url_prefix="/dashboardADM")
 
 @admin_required
-@dashboardADM_bp.route('/', methods=['GET','POST'])
+@dashboardADM_bp.route('/', methods=['GET'])
 def dashboardADM():
     flights.loadFlights()
-
-    if request.method == "GET":
-        return redirect(url_for("dashboard.dashboard"))
+    return render_template(
+        "dashboardADM.html",
+        flights=flights.flights
+    )
 
 @admin_required
 @dashboardADM_bp.route("/flight_add", methods=["GET", "POST"])

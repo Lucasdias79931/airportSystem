@@ -208,6 +208,7 @@ body {
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         {% block navdash %}{% endblock %}
+        <a class="nav-link" href="{{ url_for('settings.settings') }}">Settings</a>
         {% if not session.get('usuario') %}
           <li class="nav-item"><a class="nav-link" href="/auth/login">Login</a></li>
           <li class="nav-item"><a class="nav-link" href="/user/register">Registrar</a></li>

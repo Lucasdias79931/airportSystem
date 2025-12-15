@@ -32,15 +32,21 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center">
-            <li class="nav-item">
-                <li class="nav-item"><a class="nav-link" href="/dashboardADM">dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="/settings/users">Users</a></li>
+       <ul class="navbar-nav ms-auto align-items-center">
+          <a class="nav-link" href="{{ url_for('dashboardADM.dashboardADM') }}">Rotas CRUD</a>
+          
 
+          <li class="nav-item">
+              <a class="nav-link" href="/dashboard">Dashboard</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/settings/users">Users</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/auth/logout">Logout</a>
+          </li>
+      </ul>
 
-                <li class="nav-item"><a class="nav-link" href="/auth/logout">Logout</a></li>
-            </li>    
-        </ul>
     </div>
   </div>
 </nav>
