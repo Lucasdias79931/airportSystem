@@ -19,6 +19,9 @@ def dashboard():
     airports = [a.name for a in airportSystem.airports]
     path = None
     bought = False;
+    userLogged = False;
+    if "usuario" in session:
+        userLogged = userService.findByCpf(session["usuario"]) != None;
     legs : list[FlightSegment] = []
     error = None
         
@@ -48,18 +51,16 @@ def dashboard():
                         if not newLeg:
                             continue;
                         legs.append(newLeg);
-                    user = userService.findByCpf(session["usuario"]);
-                    print(user);
+                    if userLogged:
+                        user = userService.findByCpf(session["usuario"]);
 
-                    if user and user.flightsBookedIDS:
-                        bought = False 
-                        for f in user.flightsBookedIDS:
-                            if f.path == path.path:
-                                bought = True;
-                                break;
+                        if user and user.flightsBookedIDS:
+                            bought = False 
+                            for f in user.flightsBookedIDS:
+                                if f.path == path.path:
+                                    bought = True;
+                                    break;
 
-                        print ("user flights: ", user.flightsBookedIDS);
-                        print ("path flights: ", path.path);
 
         except Exception as e:
             traceback.print_exc()
@@ -71,7 +72,8 @@ def dashboard():
         path=path,
         error=error,
         legs=legs,
-        bought=bought
+        bought=bought,
+        userLogged=userLogged
     )
 
 
@@ -100,7 +102,6 @@ def book_flight():
 
         if not tempFlight: continue;
 
-        print(tempFlight.seatsTaken);
         assert tempFlight.getSeat();
 
     booking = flightModule.addFlight(userCpf=user.cpf, flight=flight)

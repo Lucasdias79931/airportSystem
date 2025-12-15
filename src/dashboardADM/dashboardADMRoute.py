@@ -13,7 +13,7 @@ def dashboardADM():
     flights.loadFlights()
 
     if request.method == "GET":
-        return render_template("dashboardADM.html", flights = flights.flights)
+        return redirect(url_for("dashboard.dashboard"))
 
 @admin_required
 @dashboardADM_bp.route("/flight_add", methods=["GET", "POST"])

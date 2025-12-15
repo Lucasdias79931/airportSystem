@@ -5,6 +5,4 @@ home_bp = Blueprint("home", __name__, url_prefix="/")
 
 @home_bp.route("/")
 def index():
-    flights.loadFlights();
-
-    return render_template("home.html", flights = flights.flights)
+    return redirect(url_for("dashboard.dashboard"))
