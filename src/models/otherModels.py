@@ -51,6 +51,17 @@ class FlightSegment:
     def __repr__(self):
         return f"{self.plane.airport.name} -> {self.destination.name} ({self.departure:%H:%M})" if self.plane  and self.plane.airport and self.destination else "";
 
+    def getSeat(self) -> bool:
+        if self.full():
+            return False;
+
+        self.seatsTaken += 1;
+        return True
+
+    def full(self) -> bool:
+        return self.seatsTaken + 1 > self.plane.model.amountOfSeats;
+
+
 def distance(a: Coordinate, b: Coordinate) -> float:
     R = 6371.0
 

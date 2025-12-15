@@ -4,6 +4,36 @@
 
 {% block head %}
 <style>
+
+.book-form {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.search-btn-disabled {
+  background: ##F51711;      /* red */
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.search-btn-disabled:hover {
+  background: ##F51711;      /* prevent hover change */
+}
+
+.book-btn {
+  padding: 12px 26px;
+  font-size: 16px;
+}
+.flight-card {
+  position: relative;
+}
+
+.book-form {
+  position: absolute;
+  bottom: 20px;
+  right: 24px;
+}
 .flight-card {
   max-width: 900px;
   margin: 30px auto;
@@ -183,7 +213,7 @@
     <div class="field">
       <label>Decolagem</label>
       <input
-        type="datetime-local"
+        type="date"
         name="departure"
         value="{{ request.form.departure or '' }}"
         required
@@ -199,14 +229,14 @@
   {% endif %}
 
 
-  {% if path and path.path%}
+  {% if legs%}
     <div class="flight-card">
 
       <div class="flight-header">
         <div class="route">
-          <span class="city">{{ path.path[0].origin.name }}</span>
+          <span class="city">{{ legs[0].origin.name }}</span>
           <span class="arrow">→</span>
-          <span class="city">{{ path.path[-1].destination.name }}</span>
+          <span class="city">{{ legs[-1].destination.name }}</span>
         </div>
 
         <div class="price">
@@ -237,7 +267,7 @@
       </div>
 
       <div class="segments">
-        {% for s in path.path %}
+        {% for s in legs %}
           <div class="segment">
             <span class="seg-route">
               {{ s.origin.name }} → {{ s.destination.name }}
@@ -248,9 +278,30 @@
           </div>
         {% endfor %}
       </div>
+      {% if not bought %}
+        <form method="post" action="{{ url_for('dashboard.book_flight') }}">
+          {# list of segment / path ids #}
+          {% for s in legs %}
+            <input type="hidden" name="path_ids" value="{{ s.id }}">
+          {% endfor %}
+
+          <input type="hidden" name="price" value="{{ path.price }}">
+          <input type="hidden" name="departure" value="{{ path.departure.isoformat() }}">
+          <input type="hidden" name="arrival" value="{{ path.arrival.isoformat() }}">
+
+          <button class="search-btn" type="submit">
+            Reservar voo
+          </button>
+        </form>
+        {%else%}
+             <button class="search-btn search-btn-disabled" disabled>
+                Voo já reservado
+            </button>
+        {% endif %}
     </div>
   {% endif %}
 </div>
+
 
 {% if airports %}
 <datalist id="airport-list">

@@ -200,6 +200,13 @@ class AirportSystem:
 
         return None;
 
+    def getFlightById(self, id : int):
+        for airport in self.airports:
+            for flight in airport.flights:
+                if flight.id == id:
+                    return flight;
+
+
     def findShortestPath(self, origin: Airport, destination: Airport, start_time: datetime) -> list[FlightSegment] | None:
         # Min-heap ordered by earliest arrival time
         queue: list[tuple[datetime, int, Airport, list[FlightSegment]]] = []
@@ -219,7 +226,7 @@ class AirportSystem:
                 assert flight.origin == airport;
                 if not flight.destination:
                     continue;
-                if flight.seatsTaken >= flight.plane.model.amountOfSeats:
+                if flight.full():
                     continue;
 
                 # Must depart after we arrive

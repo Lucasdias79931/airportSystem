@@ -25,6 +25,10 @@ def addFlight(flight : Flight, userCpf : str):
     flight.id = lastId + 1;
     flight.userId = userCpf;
     lastId += 1;
+    return flight;
+
+def getFlightById(id : int):
+    return flights[id];
 
 def saveFlights():
     with open("flights.bin", "wb") as f:   # "wb" = write binary
