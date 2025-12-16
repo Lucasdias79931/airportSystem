@@ -26,25 +26,28 @@
                     top: 0.0%;
                 }
                 .leaflet-container { font-size: 1rem; }
-            </style>
 
-            <style>html, body {
+            body {
+              background: url("{{ url_for('static', filename='images/background.jpg') }}") no-repeat center center fixed;
+              background-size: cover;
+              color: white;
+              text-shadow: 1px 1px 3px black;
+            }
+           html, body {
                 width: 100%;
                 height: 100%;
                 margin: 0;
                 padding: 0;
             }
-            </style>
-
-            <style>#map {
+            #map {
                 position:absolute;
                 top:0;
                 bottom:0;
                 right:0;
                 left:0;
                 }
-            </style>
-
+           
+              </style>
             <script>
                 L_NO_TOUCH = false;
                 L_DISABLE_3D = false;
@@ -53,23 +56,7 @@
         
     <script src="https://cdn.jsdelivr.net/npm/leaflet-textpath@1.2.3/leaflet.textpath.min.js"></script>
 
-    <style>
-
-  body {
-    background: url("{{ url_for('static', filename='images/background.jpg') }}") no-repeat center center fixed;
-    background-size: cover;
-    color: white;
-    text-shadow: 1px 1px 3px black;
-  }
-
-  body {
-    background: url("{{ url_for('static', filename='images/background.jpg') }}") no-repeat center center fixed;
-    background-size: cover;
-    color: white;
-    text-shadow: 1px 1px 3px black;
-  }
-
-  </style>
+  
 
 {% endblock %}
 
