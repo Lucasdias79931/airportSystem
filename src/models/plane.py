@@ -135,7 +135,7 @@ class AirportSystem:
             if n < i: 
                 break;
 
-    def makePlaneRoutes(self, plane: Plane, daysForward: int, startTime : datetime):
+    def makePlaneRoutes(self, plane: Plane, daysForward: int, startTime : datetime, discount:float=0.0):
         if plane.airport is None:
             return;
 
@@ -171,6 +171,8 @@ class AirportSystem:
 
             global lastid
             price : float = dist * plane.model.costKm;
+            price -= price*discount
+
             flight = FlightSegment(
                 id=lastid + 1,
                 origin=currentAirport,
@@ -206,6 +208,7 @@ class AirportSystem:
                 if flight.id == id:
                     return flight;
 
+  
 
     def findShortestPath(self, origin: Airport, destination: Airport, start_time: datetime) -> list[FlightSegment] | None:
         # Min-heap ordered by earliest arrival time
